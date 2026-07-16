@@ -1,0 +1,28 @@
+{
+  "name": "VIBY — مساعد المنيو",
+  "short_name": "VIBY",
+  "description": "مساعد منيو بالعامية المصرية للكافيهات — امسح، اتكلم، واختار بثقة.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#FAF7F2",
+  "theme_color": "#FAF7F2",
+  "lang": "ar",
+  "dir": "rtl",
+  "categories": ["food", "lifestyle"],
+  "icons": [
+    {
+      "src": "./assets/icons/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icons/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

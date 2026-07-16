@@ -1,0 +1,17 @@
+{
+  "id": "demo",
+  "catalogKey": "demo",
+  "displayName": "ديلي جريند",
+  "locale": "ar",
+  "theme": "system",
+  "currency": "EGP",
+  "features": {
+    "analytics": true,
+    "darkMode": true,
+    "favorites": false,
+    "orderHistory": false,
+    "loyaltyPoints": false,
+    "rewards": false,
+    "coupons": false
+  }
+}

@@ -1,0 +1,15 @@
+/* VIBY — dark theme overrides (loaded only when data-theme="dark") */
+
+html[data-theme="dark"] {
+  --bg: #1a1816;
+  --bg-elevated: #24211e;
+  --bg-input: #2a2724;
+  --bg-glass: rgba(36, 33, 30, 0.72);
+  --bg-glass-strong: rgba(42, 39, 36, 0.88);
+  --text: #f2ebe3;
+  --text-muted: #a89f94;
+  --border: rgba(242, 235, 227, 0.1);
+  --shadow-soft: 0 10px 28px rgba(0, 0, 0, 0.35);
+  --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.3);
+  --shadow-lift: 0 14px 36px rgba(0, 0, 0, 0.4);
+}

@@ -1,0 +1,68 @@
+/* VIBY — Premium café palette (warm light only) */
+
+:root {
+  --cafe-beige: #e6dcc8;
+  --cafe-beige-deep: #ddd0ba;
+  --cafe-pistachio: #B7C89A;
+  --cafe-white: #F5F1EA;
+  --cafe-white-solid: #FFFDF9;
+  --cafe-burgundy: #6A1E3A;
+  --cafe-burgundy-deep: #4A1529;
+  --cafe-coffee: #2E2A27;
+  --cafe-forest: #B7C89A;
+  --cafe-forest-soft: rgba(183, 200, 154, 0.4);
+  --cafe-golden: #f0c44a;
+  --cafe-golden-deep: #dfa128;
+  --cafe-golden-warm: #ffe9a8;
+
+  --bg: var(--cafe-white);
+  --bg-elevated: var(--cafe-white-solid);
+  --bg-input: #ffffff;
+  --bg-glass: rgba(255, 253, 249, 0.72);
+  --bg-glass-strong: rgba(255, 253, 249, 0.92);
+  --text: var(--cafe-coffee);
+  --text-muted: rgba(46, 42, 39, 0.6);
+  --text-on-accent: #FFFDF9;
+  --border: rgba(0, 0, 0, 0.05);
+  --border-forest: rgba(0, 0, 0, 0.05);
+
+  --accent: var(--cafe-burgundy);
+  --accent-soft: rgba(106, 30, 58, 0.08);
+  --accent-forest: var(--cafe-pistachio);
+  --accent-forest-soft: rgba(183, 200, 154, 0.2);
+
+  --radius-lg: 22px;
+  --radius-md: 16px;
+  --radius-sm: 12px;
+  --radius-pill: 999px;
+  --glass-blur: 24px;
+  --shadow-soft: 0 8px 30px rgba(0, 0, 0, 0.04);
+  --shadow-card: 0 12px 40px rgba(0, 0, 0, 0.05);
+  --shadow-lift: 0 20px 50px rgba(0, 0, 0, 0.08);
+
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 20px;
+  --space-lg: 28px;
+  --space-xl: 40px;
+
+  --font-sans: "Inter", "Tajawal", system-ui, sans-serif;
+  --font-display: "Inter", "Tajawal", serif;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --header-h: 60px;
+  --tap-min: 48px;
+}
+
+html {
+  lang: ar;
+}
+
+html.fonts-ready {
+  --font-sans: "Inter", "Tajawal", system-ui, sans-serif;
+  --font-display: "Inter", "Tajawal", serif;
+}
+
+html[data-theme="light"],
+html:not([data-theme="dark"]) {
+  color-scheme: light;
+}

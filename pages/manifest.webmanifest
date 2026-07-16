@@ -1,0 +1,19 @@
+{
+  "name": "VIBY — مساعد المنيو",
+  "short_name": "VIBY",
+  "description": "مساعد منيو بالعامية المصرية للكافيهات.",
+  "start_url": "../index.html",
+  "scope": "../",
+  "display": "standalone",
+  "background_color": "#E6DCC8",
+  "theme_color": "#E6DCC8",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "../assets/icons/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

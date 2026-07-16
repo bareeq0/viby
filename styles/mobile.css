@@ -1,0 +1,155 @@
+/* VIBY — mobile-first (QR / one-handed). Base styles; desktop in min-width queries. */
+
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --tap-min: 48px;
+  --mobile-chat-pad-bottom: calc(128px + var(--safe-bottom));
+  --mobile-chat-pad-bottom-dock: calc(188px + var(--safe-bottom));
+}
+
+html {
+  touch-action: manipulation;
+}
+
+body {
+  -webkit-tap-highlight-color: rgba(47, 79, 65, 0.12);
+}
+
+.app {
+  width: 100%;
+  max-width: 100%;
+  min-height: 100dvh;
+  min-height: -webkit-fill-available;
+}
+
+.header {
+  padding-top: var(--safe-top);
+  padding-left: calc(var(--space-md) + var(--safe-left));
+  padding-right: calc(var(--space-md) + var(--safe-right));
+  min-height: calc(var(--header-h) + var(--safe-top));
+}
+
+.header__action {
+  min-height: var(--tap-min);
+  min-width: var(--tap-min);
+  padding: 10px 18px;
+  touch-action: manipulation;
+}
+
+.chat__messages {
+  padding-bottom: var(--mobile-chat-pad-bottom);
+  -webkit-overflow-scrolling: touch;
+}
+
+body.reply-dock-active .chat__messages {
+  padding-bottom: var(--mobile-chat-pad-bottom-dock);
+}
+
+.reply-bubbles {
+  align-items: stretch;
+  gap: 8px;
+  max-height: min(36vh, 220px);
+}
+
+.reply-bubble {
+  width: auto;
+  max-width: 100%;
+  flex: 1 1 calc(50% - 8px);
+  min-width: min(100%, 160px);
+}
+
+.menu-card {
+  min-height: calc(var(--tap-min) + 24px);
+  align-items: center;
+  touch-action: manipulation;
+}
+
+.menu-card__thumb {
+  width: 52px;
+  height: 52px;
+}
+
+.header__menu {
+  min-height: 40px;
+  padding: 8px 14px;
+  font-size: 0.8125rem;
+  touch-action: manipulation;
+}
+
+.footer {
+  display: none;
+}
+
+.message__stack {
+  max-width: min(96%, 520px);
+}
+
+.message--cards .message__stack {
+  max-width: 100%;
+}
+
+.vip-mascot {
+  left: auto;
+  right: calc(var(--space-sm) + var(--safe-right));
+  bottom: auto;
+  top: calc(var(--header-h) + var(--safe-top) + 2px);
+  width: 50px;
+  height: 68px;
+  opacity: 1;
+  filter: drop-shadow(0 6px 12px color-mix(in srgb, var(--cafe-golden-deep) 22%, transparent));
+}
+
+@media (min-width: 640px) {
+  .app {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .header {
+    padding-top: 0;
+    min-height: var(--header-h);
+    padding-left: var(--space-lg);
+    padding-right: var(--space-lg);
+  }
+
+  .chat__messages {
+    padding-bottom: 104px;
+  }
+
+  body.reply-dock-active .chat__messages {
+    padding-bottom: 104px;
+  }
+
+  .reply-bubbles {
+    align-items: flex-end;
+    max-height: min(42vh, 280px);
+  }
+
+  .reply-bubble {
+    width: auto;
+    max-width: min(100%, 320px);
+    font-size: 0.9375rem;
+  }
+
+  .footer {
+    display: block;
+  }
+
+  .vip-mascot {
+    left: 20px;
+    right: auto;
+    top: auto;
+    bottom: 120px;
+    width: 62px;
+    height: 72px;
+    opacity: 0.92;
+  }
+}
+
+@media (min-width: 640px) and (pointer: fine) {
+  .reply-bubble {
+    width: auto;
+  }
+}

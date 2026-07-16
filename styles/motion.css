@@ -1,0 +1,252 @@
+/* VIBY — subtle physics motion (transform + opacity only) */
+
+:root {
+  --ease-out-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring-soft: cubic-bezier(0.28, 1.12, 0.52, 1);
+  --ease-spring: cubic-bezier(0.34, 1.18, 0.56, 1);
+  --dur-micro: 0.2s;
+  --dur-spring: 0.55s;
+  --dur-spring-short: 0.42s;
+  --dur-float: 6.5s;
+}
+
+/* —— Chat bubbles —— */
+
+.message--enter {
+  animation-duration: var(--dur-spring);
+  animation-timing-function: var(--ease-spring-soft);
+  animation-fill-mode: both;
+  animation-delay: var(--motion-delay, 0ms);
+}
+
+.message--user.message--enter {
+  animation-name: bubble-in-user;
+}
+
+.message--assistant.message--enter:not(.message--cards):not(.message--typing):not(.message--product) {
+  animation-name: bubble-in-assistant;
+}
+
+.message--typing.message--enter {
+  animation-name: bubble-in-typing;
+  animation-duration: var(--dur-spring-short);
+}
+
+.message--product.message--enter {
+  animation-name: bubble-in-cards-wrap;
+  animation-duration: var(--dur-spring);
+}
+
+.message--cards.message--enter {
+  animation-name: bubble-in-cards-wrap;
+  animation-duration: var(--dur-spring-short);
+}
+
+.product-showcase {
+  transition:
+    transform var(--dur-micro) var(--ease-spring-soft),
+    box-shadow var(--dur-micro) var(--ease-out-smooth);
+}
+
+.product-showcase__menu {
+  transition:
+    transform var(--dur-micro) var(--ease-spring-soft),
+    box-shadow var(--dur-micro) var(--ease-out-smooth);
+}
+
+@keyframes bubble-in-user {
+  0% {
+    opacity: 0;
+    transform: translate3d(12px, 10px, 0) scale(0.94);
+  }
+  65% {
+    opacity: 1;
+    transform: translate3d(-2px, -2px, 0) scale(1.015);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes bubble-in-assistant {
+  0% {
+    opacity: 0;
+    transform: translate3d(-10px, 12px, 0) scale(0.95);
+  }
+  68% {
+    opacity: 1;
+    transform: translate3d(1px, -2px, 0) scale(1.012);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes bubble-in-typing {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes bubble-in-cards-wrap {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 6px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* —— Quick reply bubbles —— */
+
+.reply-bubble {
+  transition:
+    transform var(--dur-micro) var(--ease-spring-soft),
+    box-shadow var(--dur-micro) var(--ease-out-smooth),
+    border-color var(--dur-micro) var(--ease-out-smooth),
+    opacity var(--dur-micro) var(--ease-out-smooth);
+}
+
+.reply-bubble.motion-enter {
+  animation: reply-bubble-in var(--dur-spring-short) var(--ease-spring-soft) both;
+  animation-delay: var(--motion-delay, 0ms);
+}
+
+@keyframes reply-bubble-in {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0) scale(0.92);
+  }
+  70% {
+    opacity: 1;
+    transform: translate3d(0, -2px, 0) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+/* —— Menu cards —— */
+
+.menu-card {
+  transition:
+    transform var(--dur-micro) var(--ease-spring-soft),
+    border-color var(--dur-micro) var(--ease-out-smooth),
+    background var(--dur-micro) var(--ease-out-smooth),
+    box-shadow var(--dur-micro) var(--ease-out-smooth);
+}
+
+.menu-card.motion-enter {
+  animation: menu-card-in var(--dur-spring) var(--ease-spring-soft) both;
+  animation-delay: var(--motion-delay, 0ms);
+}
+
+@keyframes menu-card-in {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0) scale(0.96);
+  }
+  72% {
+    opacity: 1;
+    transform: translate3d(0, -2px, 0) scale(1.01);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+/* —— Chrome micro-interactions —— */
+
+.header__menu {
+  transition:
+    background var(--dur-micro) var(--ease-out-smooth),
+    border-color var(--dur-micro) var(--ease-out-smooth),
+    transform var(--dur-micro) var(--ease-spring-soft),
+    box-shadow var(--dur-micro) var(--ease-out-smooth);
+}
+
+.header__action {
+  transition:
+    background var(--dur-micro) var(--ease-out-smooth),
+    border-color var(--dur-micro) var(--ease-out-smooth),
+    transform var(--dur-micro) var(--ease-spring-soft),
+    box-shadow var(--dur-micro) var(--ease-out-smooth);
+}
+
+.chat__reply-dock {
+  transition: opacity var(--dur-micro) var(--ease-out-smooth);
+}
+
+.reply-dock--disabled {
+  transition: opacity var(--dur-micro) var(--ease-out-smooth);
+}
+
+/* —— Typing dots (softer bounce) —— */
+
+.typing span {
+  animation: typing-bounce-soft 1.35s var(--ease-out-smooth) infinite;
+}
+
+@keyframes typing-bounce-soft {
+  0%,
+  55%,
+  100% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0.42;
+  }
+  28% {
+    transform: translate3d(0, -3px, 0);
+    opacity: 0.95;
+  }
+}
+
+/* —— Mascot float sync —— */
+
+.vip-mascot__float {
+  animation: vip-float-soft var(--dur-float) ease-in-out infinite;
+}
+
+@keyframes vip-float-soft {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -5px, 0);
+  }
+}
+
+.vip-mascot--user .vip-companion__body,
+.vip-mascot--assistant .vip-companion__body {
+  animation-timing-function: var(--ease-spring-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .message--enter,
+  .reply-bubble.motion-enter,
+  .menu-card.motion-enter {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .vip-mascot__float {
+    animation: none !important;
+  }
+
+  .typing span {
+    animation: none !important;
+    opacity: 0.65;
+  }
+}

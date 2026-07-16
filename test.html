@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VIBY Recommendation Engine Unit Tests</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f7f9fa;
+      color: #333;
+      margin: 40px;
+    }
+    h1 {
+      color: #2c3e50;
+    }
+    .test-case {
+      background: #fff;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      border-left: 5px solid #ccc;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .test-case.pass {
+      border-left-color: #2ecc71;
+    }
+    .test-case.fail {
+      border-left-color: #e74c3c;
+    }
+    .test-name {
+      font-weight: bold;
+      font-size: 1.1em;
+      margin-bottom: 5px;
+    }
+    .test-details {
+      font-family: monospace;
+      white-space: pre-wrap;
+      color: #555;
+    }
+    .status {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      color: #fff;
+      font-size: 0.85em;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .status.pass { background: #2ecc71; }
+    .status.fail { background: #e74c3c; }
+    #summary {
+      font-size: 1.2em;
+      margin-bottom: 20px;
+      padding: 15px;
+      border-radius: 6px;
+      background: #eef2f7;
+      border: 1px solid #d0d7de;
+    }
+  </style>
+</head>
+<body>
+  <h1>VIBY Recommendation Engine Test Suite</h1>
+  <div id="summary">Running tests...</div>
+  <div id="results"></div>
+
+  <script type="module">
+    import { getCatalog } from "./scripts/catalog.js";
+    import { createSession } from "./scripts/logic.js";
+    import { getNextFlowStep, applyFlowAnswer } from "./scripts/flows.js";
+    import { recommend } from "./scripts/recommendation-engine.js";
+    import { getFlowFilteredMenu } from "./scripts/menu-filter.js";
+
+    const resultsDiv = document.getElementById("results");
+    const summaryDiv = document.getElementById("summary");
+
+    let total = 0;
+    let passed = 0;
+
+    function assert(condition, message) {
+      if (!condition) {
+        throw new Error(message || "Assertion failed");
+      }
+    }
+
+    async function runTest(name, fn) {
+      total++;
+      const el = document.createElement("div");
+      el.className = "test-case";
+      resultsDiv.appendChild(el);
+
+      try {
+        const logBuffer = [];
+        const logger = {
+          log: (...args) => logBuffer.push(args.map(a => typeof a === 'object' ? JSON.stringify(a, null, 2) : a).join(" "))
+        };
+        await fn(logger);
+        el.className = "test-case pass";
+        el.innerHTML = `
+          <div class="status pass">PASS</div>
+          <div class="test-name">${name}</div>
+          <div class="test-details">${logBuffer.join("\n")}</div>
+        `;
+        passed++;
+      } catch (err) {
+        el.className = "test-case fail";
+        el.innerHTML = `
+          <div class="status fail">FAIL</div>
+          <div class="test-name">${name}</div>
+          <div class="test-details" style="color: #c0392b;">${err.message}\n\n${err.stack}</div>
+        `;
+      }
+      updateSummary();
+    }
+
+    function updateSummary() {
+      summaryDiv.innerHTML = `<strong>Results:</strong> ${passed} / ${total} tests passed.`;
+      if (passed === total) {
+        summaryDiv.style.background = "#d4edda";
+        summaryDiv.style.borderColor = "#c3e6cb";
+        summaryDiv.style.color = "#155724";
+      } else {
+        summaryDiv.style.background = "#f8d7da";
+        summaryDiv.style.borderColor = "#f5c6cb";
+        summaryDiv.style.color = "#721c24";
+      }
+    }
+
+    // Load bareeq catalog
+    const menu = await getCatalog("bareeq");
+
+    // Test 1: Active Category Config Mapping
+    await runTest("Active Category Filter restricts menu to Matcha", async (t) => {
+      const session = createSession(menu, { id: "bareeq" });
+      await applyFlowAnswer("pick_matcha", session);
+
+      const filtered = getFlowFilteredMenu(session);
+      t.log("Total products in catalog:", menu.length);
+      t.log("Filtered products after selecting Matcha:", filtered.length);
+
+      assert(filtered.length > 0, "Matcha menu should not be empty");
+      filtered.forEach(item => {
+        const label = `${item.nameEn} ${item.nameAr} ${item.descriptionAr}`;
+        assert(item.tags.includes("matcha") || /matcha|ماتشا/i.test(label), `Item ${item.nameEn} should be Matcha`);
+      });
+      t.log("Verified all remaining items are Matcha products.");
+    });
+
+    // Test 2: Iced Matcha Flow skips style and budget questions
+    await runTest("Iced Matcha Flow recommends immediately", async (t) => {
+      const session = createSession(menu, { id: "bareeq" });
+      await applyFlowAnswer("pick_matcha", session);
+      
+      const nextStep1 = getNextFlowStep(session);
+      t.log("Next step after pick_matcha:", nextStep1 ? nextStep1.id : "None (recommendation)");
+      assert(nextStep1.id === "temperature", "Should ask temperature first");
+
+      await applyFlowAnswer("temp_iced", session);
+      const nextStep2 = getNextFlowStep(session);
+      t.log("Next step after temp_iced:", nextStep2 ? nextStep2.id : "None (recommendation)");
+      
+      assert(nextStep2 === null, "Flow should stop and recommend immediately since only 1 iced matcha exists");
+
+      const rec = recommend(session);
+      t.log("Recommended item:", rec.primary.item.nameEn);
+      assert(rec.primary.item.id === "bq-japanese-iced-white-chocolate-matcha", "Should recommend Iced White Chocolate Matcha");
+    });
+
+    // Test 3: Hot Matcha Flow skips Style and Budget questions
+    await runTest("Hot Matcha Flow skips non-reducing questions", async (t) => {
+      const session = createSession(menu, { id: "bareeq" });
+      await applyFlowAnswer("pick_matcha", session);
+
+      const nextStep1 = getNextFlowStep(session);
+      assert(nextStep1.id === "temperature", "Should ask temperature first");
+
+      await applyFlowAnswer("temp_hot", session);
+      
+      // Since all hot matchas have high sweetness (flavored) and price 120 (budget has no effect),
+      // there should be NO questions that reduce the candidate pool.
+      const nextStep2 = getNextFlowStep(session);
+      t.log("Next step after temp_hot:", nextStep2 ? nextStep2.id : "None (recommendation)");
+      assert(nextStep2 === null, "Should recommend immediately, skipping style and budget questions");
+
+      const rec = recommend(session);
+      t.log("Recommended hot Matcha item:", rec.primary.item.nameEn);
+      assert(rec.primary.item.temperature === "hot" || rec.primary.item.temperature === "room", "Recommended item should be hot/room temperature");
+    });
+
+    // Test 4: Coffee Flow asks temperature then continues
+    await runTest("Coffee Flow evaluates questions dynamically based on candidate reduction", async (t) => {
+      const session = createSession(menu, { id: "bareeq" });
+      await applyFlowAnswer("pick_coffee", session);
+
+      const nextStep1 = getNextFlowStep(session);
+      t.log("First question in coffee flow:", nextStep1.id);
+      assert(nextStep1.id === "temperature", "Temperature reduces the coffee pool most, so it should be asked first");
+
+      await applyFlowAnswer("temp_iced", session);
+
+      // Verify the next question reduces the candidates
+      const nextStep2 = getNextFlowStep(session);
+      t.log("Second question in iced coffee flow:", nextStep2 ? nextStep2.id : "None");
+      assert(nextStep2 !== null, "Should ask another question if candidates can be reduced");
+    });
+
+  </script>
+</body>
+</html>
