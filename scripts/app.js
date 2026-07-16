@@ -18,7 +18,7 @@ import {
   delay,
 } from "../components/chat-sequence.js";
 import { setSplashCafeName, runSplash } from "../components/splash.js";
-import { mountVipMascot, reactToUserMessage, reactToCelebrate, reactToLoading, reactToRejectFeedback, reactToRejectPrompt, reactToListening, glanceAtMenu } from "../components/vip-mascot.js";
+import { mountVipMascot, reactToUserMessage, reactToCelebrate, reactToLoading, reactToRejectFeedback, reactToRejectPrompt, reactToListening, glanceAtMenu, lookAtReplyDock } from "../components/vip-mascot.js";
 import { isRejectAnswer } from "./flows.js";
 import { registerServiceWorker } from "./pwa.js";
 import { initPlatform, refreshPlatformContext, getPlatformDeps } from "../platform/bootstrap.js";
@@ -68,6 +68,9 @@ async function deliverTurn(turn) {
     });
   }
   setQuickReplies(turn.quickReplies, handleBubbleReply);
+  if (turn.quickReplies?.length > 0) {
+    lookAtReplyDock();
+  }
   reactToListening(true);
 }
 
@@ -89,6 +92,9 @@ async function startConversation() {
   );
 
   setQuickReplies(quickReplies, handleBubbleReply);
+  if (quickReplies?.length > 0) {
+    lookAtReplyDock();
+  }
   setRepliesEnabled(true);
   reactToListening(true);
   isBusy = false;

@@ -15,23 +15,21 @@ let reducedMotion = false;
 // State Machine
 let activeState = "idle"; // idle, thinking, listening, celebrating, sleepy, wave, confused
 
-// Cursor tracking
-let mouseX = 0;
-let mouseY = 0;
-let mouseActive = false;
-let mouseTimeout = null;
-
-// Eyes interpolation
+// Eye positions and interpolation
 let currentLookX = 0;
 let currentLookY = 0;
+let targetLookX = 0;
+let targetLookY = 0;
+let microX = 0;
+let microY = 0;
+
 let rAFId = null;
 let isPageVisible = true;
-let overrideTarget = null;
+let saccadeTimer = null;
 let overrideTimer = null;
 
 // Micro Expressions
 let lastIdleAction = "";
-const IDLE_ACTIONS = ["blink", "smile", "look_left", "look_right", "look_up", "tiny_bounce", "head_tilt"];
 
 const SLEEP_TIMEOUT_MS = 15000; // 15 seconds of inactivity triggers Sleepy state
 
@@ -47,16 +45,16 @@ export function mountVipMascot() {
   
   if (!reducedMotion) {
     scheduleIdleExpression();
+    scheduleMicroSaccades();
     resetSleepTimer();
     wireCompanionEvents();
-    wireCursorTracking();
+    wireNaturalInteractions();
     wireReadingMode();
     wirePageVisibility();
     startAttentionLoop();
   }
 
   watchMessageList();
-  wireReplyDock();
 }
 
 function wireCompanionEvents() {
@@ -120,60 +118,6 @@ function resetSleepTimer() {
   }, SLEEP_TIMEOUT_MS);
 }
 
-function wireReplyDock() {
-  const dock = document.getElementById("replyDock");
-  if (!dock) return;
-
-  dock.addEventListener(
-    "pointerenter",
-    (event) => {
-      const btn = bubbleFromEvent(event);
-      if (btn) focusReplyOption(btn);
-    },
-    true
-  );
-
-  dock.addEventListener("click", (event) => {
-    const btn = bubbleFromEvent(event);
-    if (btn) focusReplyOption(btn);
-  });
-}
-
-/** @param {Event} event */
-function bubbleFromEvent(event) {
-  return /** @type {HTMLElement | null} */ (
-    event.target instanceof Element ? event.target.closest(".reply-bubble") : null
-  );
-}
-
-/** @param {HTMLElement} btn */
-function focusReplyOption(btn) {
-  resetSleepTimer();
-  
-  // Calculate relative target offset for btn immediately
-  const mascotBox = root.getBoundingClientRect();
-  const targetBox = btn.getBoundingClientRect();
-  const mx = mascotBox.left + mascotBox.width / 2;
-  const my = mascotBox.top + mascotBox.height * 0.42;
-  const tx = targetBox.left + targetBox.width / 2;
-  const ty = targetBox.top + targetBox.height / 2;
-  const dx = tx - mx;
-  const dy = ty - my;
-  const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-  const clampDist = Math.min(8, dist * 0.045);
-  const lookX = (dx / dist) * clampDist;
-  const lookY = (dy / dist) * clampDist;
-
-  // Look at button for 400ms
-  setOverrideTarget(lookX, lookY, 400);
-  pulseHeadTilt(680);
-
-  // Then look back at the user (center) for 800ms
-  setTimeout(() => {
-    setOverrideTarget(0, 0, 800);
-  }, 400);
-}
-
 function pulseHeadTilt(ms = 680) {
   if (!root || reducedMotion) return;
   root.classList.add("vip-mascot--tilt");
@@ -187,38 +131,26 @@ function watchMessageList() {
   obs.observe(messageList, { childList: true, subtree: true });
 }
 
-// Cursor tracking
-function wireCursorTracking() {
-  document.addEventListener("pointermove", (e) => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-    mouseActive = true;
-    
-    clearTimeout(mouseTimeout);
-    startAttentionLoop();
-
-    // Return to neutral after 1.5 seconds of no mouse movement
-    mouseTimeout = setTimeout(() => {
-      mouseActive = false;
-    }, 1500);
-  });
-
-  // When user clicks -> look toward cursor for 1s
+// Natural click interactions (no pointer follow, just click reactions)
+function wireNaturalInteractions() {
   document.addEventListener("click", (e) => {
-    if (reducedMotion || !root) return;
-    if (companion && companion.contains(e.target)) return; // giggling handled separately
+    if (reducedMotion || !root || !isMascotIdle()) return;
+    if (companion && companion.contains(e.target)) return; // Giggle reaction handled separately
     
-    const mascotBox = root.getBoundingClientRect();
-    const mx = mascotBox.left + mascotBox.width / 2;
-    const my = mascotBox.top + mascotBox.height * 0.42;
-    const dx = e.clientX - mx;
-    const dy = e.clientY - my;
-    const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-    const clampDist = Math.min(8, dist * 0.05);
-    const lookX = (dx / dist) * clampDist;
-    const lookY = (dy / dist) * clampDist;
-
-    setOverrideTarget(lookX, lookY, 1000);
+    // Happy click reaction: blink, smile, tiny bounce
+    root.classList.add("vip-mascot--blink");
+    root.classList.add("vip-mascot--micro-bounce");
+    
+    const prevExpr = companion.getAttribute("data-expression") || "smile";
+    setExpression("happy");
+    
+    setTimeout(() => root?.classList.remove("vip-mascot--blink"), 240);
+    setTimeout(() => {
+      root?.classList.remove("vip-mascot--micro-bounce");
+      if (isMascotIdle()) {
+        setExpression(prevExpr);
+      }
+    }, 800);
   });
 }
 
@@ -256,65 +188,6 @@ function wirePageVisibility() {
   });
 }
 
-export function setOverrideTarget(x, y, duration) {
-  overrideTarget = { x, y };
-  clearTimeout(overrideTimer);
-  startAttentionLoop();
-  
-  overrideTimer = setTimeout(() => {
-    overrideTarget = null;
-  }, duration);
-}
-
-// Visual attention priority target finder
-function getAttentionTarget() {
-  if (reducedMotion) return null;
-
-  if (overrideTarget) {
-    return "override";
-  }
-
-  // 1. Active quick replies
-  const dock = document.getElementById("replyDock");
-  if (dock && !dock.classList.contains("reply-dock--hidden")) {
-    const bubbles = dock.querySelectorAll(".reply-bubble");
-    if (bubbles.length > 0) {
-      return dock;
-    }
-  }
-
-  // 2. Recommendation card
-  if (messageList) {
-    const cards = messageList.querySelectorAll(".message--cards, .message--product");
-    if (cards.length > 0) {
-      return cards[cards.length - 1];
-    }
-  }
-
-  // 3. Latest assistant message bubble
-  if (messageList) {
-    const assistantMsgs = messageList.querySelectorAll(".message--assistant:not(.message--typing)");
-    if (assistantMsgs.length > 0) {
-      const lastMsg = assistantMsgs[assistantMsgs.length - 1];
-      return lastMsg.querySelector(".message__bubble") || lastMsg;
-    }
-  }
-
-  // 4. Menu button
-  const menuBtn = document.getElementById("btnExternalMenu");
-  if (menuBtn && !menuBtn.hidden) {
-    return menuBtn;
-  }
-
-  // 5. Mouse cursor
-  if (mouseActive) {
-    return "cursor";
-  }
-
-  // 6. Default (user)
-  return null;
-}
-
 // Attention system loop with smooth interpolation (lerp)
 function updateAttentionLoop() {
   if (reducedMotion || !root || !isPageVisible) {
@@ -322,53 +195,25 @@ function updateAttentionLoop() {
     return;
   }
 
-  const target = getAttentionTarget();
-  let targetX = 0;
-  let targetY = 0;
+  // Look target uses targetLookX/Y + random tiny microX/Y saccades during idle
+  const targetX = targetLookX + microX;
+  const targetY = targetLookY + microY;
 
-  if (target === "override" && overrideTarget) {
-    targetX = overrideTarget.x;
-    targetY = overrideTarget.y;
-  } else if (target === "cursor") {
-    const mascotBox = root.getBoundingClientRect();
-    const mx = mascotBox.left + mascotBox.width / 2;
-    const my = mascotBox.top + mascotBox.height * 0.42;
-    const dx = mouseX - mx;
-    const dy = mouseY - my;
-    const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-    const clampDist = Math.min(8, dist * 0.05);
-    targetX = (dx / dist) * clampDist;
-    targetY = (dy / dist) * clampDist;
-  } else if (target instanceof HTMLElement) {
-    const mascotBox = root.getBoundingClientRect();
-    const targetBox = target.getBoundingClientRect();
-    const mx = mascotBox.left + mascotBox.width / 2;
-    const my = mascotBox.top + mascotBox.height * 0.42;
-    const tx = targetBox.left + targetBox.width / 2;
-    const ty = targetBox.top + targetBox.height / 2;
-    const dx = tx - mx;
-    const dy = ty - my;
-    const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-    const clampDist = Math.min(8, dist * 0.045);
-    targetX = (dx / dist) * clampDist;
-    targetY = (dy / dist) * clampDist;
-  }
-
-  // Easing lerp (0.1 represents soft premium follow)
-  currentLookX += (targetX - currentLookX) * 0.1;
-  currentLookY += (targetY - currentLookY) * 0.1;
+  // Easing lerp (0.12 represents soft premium follow)
+  currentLookX += (targetX - currentLookX) * 0.12;
+  currentLookY += (targetY - currentLookY) * 0.12;
 
   root.style.setProperty("--vip-look-x", `${currentLookX.toFixed(3)}px`);
   root.style.setProperty("--vip-look-y", `${currentLookY.toFixed(3)}px`);
 
-  const isNeutral = Math.abs(currentLookX) < 0.01 && Math.abs(currentLookY) < 0.01;
-  if (target !== null || !isNeutral) {
+  const isNeutral = Math.abs(currentLookX - targetX) < 0.01 && Math.abs(currentLookY - targetY) < 0.01;
+  if (!isNeutral) {
     rAFId = requestAnimationFrame(updateAttentionLoop);
   } else {
-    currentLookX = 0;
-    currentLookY = 0;
-    root.style.setProperty("--vip-look-x", "0px");
-    root.style.setProperty("--vip-look-y", "0px");
+    currentLookX = targetX;
+    currentLookY = targetY;
+    root.style.setProperty("--vip-look-x", `${currentLookX.toFixed(3)}px`);
+    root.style.setProperty("--vip-look-y", `${currentLookY.toFixed(3)}px`);
     rAFId = null;
   }
 }
@@ -434,8 +279,24 @@ function applyStateAndExpression(state) {
       setExpression("smile");
       break;
     case "thinking":
-      addStateClass("typing");
-      setExpression("think");
+      // Set to soft smile first
+      setExpression("smile");
+      
+      // Premium Timing: wait 120ms -> eyes up -> bulb glow
+      clearTimeout(overrideTimer);
+      overrideTimer = setTimeout(() => {
+        if (activeState === "thinking") {
+          addStateClass("typing"); // Bulb glows
+          setExpression("smile");  // Tiny smile
+          targetLookX = 0;
+          targetLookY = -2; // Eyes move slightly upward
+          startAttentionLoop();
+
+          // Small blink
+          root.classList.add("vip-mascot--blink");
+          setTimeout(() => root?.classList.remove("vip-mascot--blink"), 180);
+        }
+      }, 120);
       break;
     case "listening":
       addStateClass("listening");
@@ -480,51 +341,123 @@ function pulseStateClass(cls, ms) {
   setTimeout(() => removeStateClass(cls), ms);
 }
 
-// Micro Expressions
+function isMascotIdle() {
+  return activeState === "idle" && !root?.classList.contains("vip-mascot--reading") && !root?.classList.contains("vip-mascot--pointing");
+}
+
+function scheduleMicroSaccades() {
+  clearTimeout(saccadeTimer);
+  
+  // Saccades only occur during idle and when look targets are at neutral center
+  const delay = 1200 + Math.random() * 2000;
+  saccadeTimer = setTimeout(() => {
+    if (isMascotIdle() && targetLookX === 0 && targetLookY === 0) {
+      // Tiny saccade (0.3px to 0.5px maximum deviation)
+      microX = (Math.random() - 0.5) * 0.8;
+      microY = (Math.random() - 0.5) * 0.5;
+      startAttentionLoop();
+    } else {
+      microX = 0;
+      microY = 0;
+    }
+    scheduleMicroSaccades();
+  }, delay);
+}
+
+// Idle Random Life Scheduler (Calm Café Companion, every 4-8 seconds)
 function scheduleIdleExpression() {
   clearTimeout(idleTimer);
-  const delayTime = 3000 + Math.random() * 5000;
+  const delayTime = 4000 + Math.random() * 4000;
+  
   idleTimer = setTimeout(() => {
-    if (!root || activeState !== "idle") {
+    if (!root || !isMascotIdle()) {
       scheduleIdleExpression();
       return;
     }
 
-    let available = IDLE_ACTIONS.filter(act => act !== lastIdleAction);
-    const action = available[Math.floor(Math.random() * available.length)];
-    lastIdleAction = action;
+    // Weighted Probabilities:
+    // 70% Breathe and Blink
+    // 20% Tiny Eye Movement
+    // 10% Micro Expression
+    const rand = Math.random();
+    
+    if (rand < 0.70) {
+      // 70% Blink (breathe is continuous via CSS)
+      root.classList.add("vip-mascot--blink");
+      setTimeout(() => root?.classList.remove("vip-mascot--blink"), 240);
+    } else if (rand < 0.90) {
+      // 20% Tiny Eye Movement
+      const choices = [
+        { x: -1.2, y: 0 },
+        { x: 1.2, y: 0 },
+        { x: 0, y: -1.0 },
+        { x: 0.8, y: 0.5 },
+        { x: -0.8, y: 0.5 }
+      ];
+      const choice = choices[Math.floor(Math.random() * choices.length)];
+      targetLookX = choice.x;
+      targetLookY = choice.y;
+      startAttentionLoop();
 
-    playMicroExpression(action);
+      setTimeout(() => {
+        if (isMascotIdle() && targetLookX === choice.x && targetLookY === choice.y) {
+          targetLookX = 0;
+          targetLookY = 0;
+          startAttentionLoop();
+        }
+      }, 1000 + Math.random() * 800);
+    } else {
+      // 10% Micro Expression
+      const expressions = ["smile", "head_tilt", "look_left", "look_right", "look_up"];
+      const available = expressions.filter(e => e !== lastIdleAction);
+      const action = available[Math.floor(Math.random() * available.length)];
+      lastIdleAction = action;
+
+      if (action === "smile") {
+        setExpression("happy");
+        setTimeout(() => {
+          if (isMascotIdle()) setExpression("smile");
+        }, 1200);
+      } else if (action === "head_tilt") {
+        pulseHeadTilt(1000);
+      } else if (action === "look_left") {
+        targetLookX = -3.0;
+        targetLookY = 0;
+        startAttentionLoop();
+        setTimeout(() => {
+          if (isMascotIdle() && targetLookX === -3.0) {
+            targetLookX = 0;
+            targetLookY = 0;
+            startAttentionLoop();
+          }
+        }, 1500);
+      } else if (action === "look_right") {
+        targetLookX = 3.0;
+        targetLookY = 0;
+        startAttentionLoop();
+        setTimeout(() => {
+          if (isMascotIdle() && targetLookX === 3.0) {
+            targetLookX = 0;
+            targetLookY = 0;
+            startAttentionLoop();
+          }
+        }, 1500);
+      } else if (action === "look_up") {
+        targetLookX = 0;
+        targetLookY = -2.0;
+        startAttentionLoop();
+        setTimeout(() => {
+          if (isMascotIdle() && targetLookY === -2.0) {
+            targetLookX = 0;
+            targetLookY = 0;
+            startAttentionLoop();
+          }
+        }, 1500);
+      }
+    }
+
     scheduleIdleExpression();
   }, delayTime);
-}
-
-function playMicroExpression(action) {
-  root.classList.remove("vip-mascot--peek-left", "vip-mascot--peek-right", "vip-mascot--peek-up", "vip-mascot--micro-bounce");
-  
-  if (action === "blink") {
-    root.classList.add("vip-mascot--blink");
-    setTimeout(() => root?.classList.remove("vip-mascot--blink"), 240);
-  } else if (action === "smile") {
-    setExpression("happy");
-    setTimeout(() => {
-      if (activeState === "idle") setExpression("smile");
-    }, 1000);
-  } else if (action === "look_left") {
-    root.classList.add("vip-mascot--peek-left");
-    setTimeout(() => root?.classList.remove("vip-mascot--peek-left"), 1200);
-  } else if (action === "look_right") {
-    root.classList.add("vip-mascot--peek-right");
-    setTimeout(() => root?.classList.remove("vip-mascot--peek-right"), 1200);
-  } else if (action === "look_up") {
-    root.classList.add("vip-mascot--peek-up");
-    setTimeout(() => root?.classList.remove("vip-mascot--peek-up"), 1200);
-  } else if (action === "tiny_bounce") {
-    root.classList.add("vip-mascot--micro-bounce");
-    setTimeout(() => root?.classList.remove("vip-mascot--micro-bounce"), 800);
-  } else if (action === "head_tilt") {
-    pulseHeadTilt(1000);
-  }
 }
 
 /** @param {'smile'|'think'|'surprised'|'happy'|'proud'|'confused'|'listening'|'sleepy'|'excited'} expression */
@@ -540,14 +473,26 @@ export function reactToUserMessage() {
 
 export function reactToAssistantMessage() {
   resetSleepTimer();
+  clearTimeout(overrideTimer);
+  
   transitionToState("wave");
-  
-  // Natural Eye Contact: Look at the user for 300ms first, then look at message
-  setOverrideTarget(0, 0, 300);
-  
-  setTimeout(() => {
+
+  // Premium Timing: wait 150ms -> look toward message
+  overrideTimer = setTimeout(() => {
+    targetLookX = 3.5;
+    targetLookY = 0.5;
     startAttentionLoop();
-  }, 300);
+
+    // Look for 1 second, then return to neutral
+    overrideTimer = setTimeout(() => {
+      targetLookX = 0;
+      targetLookY = 0;
+      startAttentionLoop();
+      if (activeState === "wave") {
+        transitionToState("idle");
+      }
+    }, 1000);
+  }, 150);
 }
 
 /** @deprecated use reactToAssistantMessage */
@@ -568,47 +513,68 @@ export function clearTypingReact() {
 
 export function reactToRecommendation(intensity = "normal") {
   resetSleepTimer();
-  
+  clearTimeout(overrideTimer);
+  clearTimeout(pointingResetTimer);
+
   if (intensity === "high") {
     transitionToState("excited");
   } else {
-    transitionToState("idle"); // Normal recommendation: calm small smile (idle expression is smile)
+    transitionToState("idle");
   }
 
-  // Handle pointing vector calculation
-  if (root && messageList && !reducedMotion) {
-    const cards = messageList.querySelectorAll(".message--cards, .message--product");
-    const last = /** @type {HTMLElement | undefined} */ (cards[cards.length - 1]);
-    if (last) {
-      const mascotBox = root.getBoundingClientRect();
-      const targetBox = last.getBoundingClientRect();
-      const mx = mascotBox.left + mascotBox.width / 2;
-      const my = mascotBox.top + mascotBox.height * 0.42;
-      const tx = targetBox.left + targetBox.width / 2;
-      const ty = targetBox.top + targetBox.height / 2;
-      const dx = tx - mx;
-      const dy = ty - my;
-      const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-      
-      // Lean/translate 14px and tilt 7 degrees towards the card
-      const pointX = (dx / dist) * 14;
-      const pointY = (dy / dist) * 8;
-      const pointTilt = (dx / dist) * 7;
-      
-      root.style.setProperty("--vip-point-x", `${pointX}px`);
-      root.style.setProperty("--vip-point-y", `${pointY}px`);
-      root.style.setProperty("--vip-point-tilt", `${pointTilt}deg`);
-      root.classList.add("vip-mascot--pointing");
-      
-      clearTimeout(pointingResetTimer);
-      pointingResetTimer = setTimeout(() => {
-        root?.classList.remove("vip-mascot--pointing");
-        root?.style.setProperty("--vip-point-x", "0px");
-        root?.style.setProperty("--vip-point-y", "0px");
-        root?.style.setProperty("--vip-point-tilt", "0deg");
-      }, 2200);
+  // Premium Timing: wait 200ms -> smile & lean & look
+  overrideTimer = setTimeout(() => {
+    if (intensity === "high") {
+      setExpression("excited");
+    } else {
+      setExpression("happy");
     }
-  }
+
+    targetLookX = 3.5;
+    targetLookY = 1.0;
+    startAttentionLoop();
+
+    // Body Lean/Tilt pointing vector calculation
+    if (root && messageList && !reducedMotion) {
+      const cards = messageList.querySelectorAll(".message--cards, .message--product");
+      const last = /** @type {HTMLElement | undefined} */ (cards[cards.length - 1]);
+      if (last) {
+        const mascotBox = root.getBoundingClientRect();
+        const targetBox = last.getBoundingClientRect();
+        const mx = mascotBox.left + mascotBox.width / 2;
+        const my = mascotBox.top + mascotBox.height * 0.42;
+        const tx = targetBox.left + targetBox.width / 2;
+        const ty = targetBox.top + targetBox.height / 2;
+        const dx = tx - mx;
+        const dy = ty - my;
+        const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+        
+        const pointX = (dx / dist) * 14;
+        const pointY = (dy / dist) * 8;
+        const pointTilt = (dx / dist) * 7;
+        
+        root.style.setProperty("--vip-point-x", `${pointX}px`);
+        root.style.setProperty("--vip-point-y", `${pointY}px`);
+        root.style.setProperty("--vip-point-tilt", `${pointTilt}deg`);
+        root.classList.add("vip-mascot--pointing");
+      }
+    }
+
+    // Hold for 1 second, then return to neutral
+    overrideTimer = setTimeout(() => {
+      targetLookX = 0;
+      targetLookY = 0;
+      startAttentionLoop();
+      
+      if (activeState === "excited" || activeState === "idle") {
+        transitionToState("idle");
+      }
+      root?.classList.remove("vip-mascot--pointing");
+      root?.style.setProperty("--vip-point-x", "0px");
+      root?.style.setProperty("--vip-point-y", "0px");
+      root?.style.setProperty("--vip-point-tilt", "0deg");
+    }, 1000);
+  }, 200);
 }
 
 export function reactToRejectPrompt() {
@@ -656,15 +622,33 @@ export function reactToListening(on) {
 }
 
 export function lookAtReplyDock() {
-  const dock = document.getElementById("replyDock");
-  if (dock && !dock.classList.contains("reply-dock--hidden")) {
+  resetSleepTimer();
+  clearTimeout(overrideTimer);
+
+  // Glance down-right at replies
+  targetLookX = 3.0;
+  targetLookY = 2.0;
+  startAttentionLoop();
+
+  overrideTimer = setTimeout(() => {
+    targetLookX = 0;
+    targetLookY = 0;
     startAttentionLoop();
-  }
+  }, 700);
 }
 
 export function glanceAtMenu() {
-  const menuBtn = document.getElementById("btnExternalMenu");
-  if (menuBtn && !menuBtn.hidden) {
+  resetSleepTimer();
+  clearTimeout(overrideTimer);
+
+  // Glance down-left at menu button
+  targetLookX = -3.0;
+  targetLookY = 1.5;
+  startAttentionLoop();
+
+  overrideTimer = setTimeout(() => {
+    targetLookX = 0;
+    targetLookY = 0;
     startAttentionLoop();
-  }
+  }, 700);
 }

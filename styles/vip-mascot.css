@@ -1,4 +1,16 @@
-/* VIBY companion — premium coffee spirit; always subtly alive */
+:root {
+  --mascot-float-y: -5px;
+  --mascot-scale: 0.4;
+  --mascot-scale-rot: 1;
+}
+
+@media (max-width: 767px) {
+  :root {
+    --mascot-float-y: -3.75px; /* -5px * 0.75 */
+    --mascot-scale: 0.3;      /* 0.4 * 0.75 */
+    --mascot-scale-rot: 0.75;  /* 25% reduction */
+  }
+}
 
 .vip-mascot {
   --vip-look-x: 0px;
@@ -799,10 +811,10 @@
     transform: translate3d(0, 0, 0) scale(1);
   }
   30% {
-    transform: translate3d(0, -9px, 0) scale(1.08, 0.92);
+    transform: translate3d(0, calc(-9px * var(--mascot-scale-rot, 1)), 0) scale(calc(1 + 0.08 * var(--mascot-scale-rot, 1)), calc(1 - 0.08 * var(--mascot-scale-rot, 1)));
   }
   60% {
-    transform: translate3d(0, 2px, 0) scale(0.95, 1.05);
+    transform: translate3d(0, calc(2px * var(--mascot-scale-rot, 1)), 0) scale(calc(1 - 0.05 * var(--mascot-scale-rot, 1)), calc(1 + 0.05 * var(--mascot-scale-rot, 1)));
   }
   100% {
     transform: translate3d(0, 0, 0) scale(1);
@@ -816,19 +828,19 @@
   }
   15% {
     /* Anticipation: squash down slightly */
-    transform: translate3d(0, 2px, 0) scale(1.12, 0.88);
+    transform: translate3d(0, calc(2px * var(--mascot-scale-rot, 1)), 0) scale(calc(1 + 0.12 * var(--mascot-scale-rot, 1)), calc(1 - 0.12 * var(--mascot-scale-rot, 1)));
   }
   40% {
     /* Jump high, stretch up */
-    transform: translate3d(0, -18px, 0) scale(0.88, 1.12);
+    transform: translate3d(0, calc(-18px * var(--mascot-scale-rot, 1)), 0) scale(calc(1 - 0.12 * var(--mascot-scale-rot, 1)), calc(1 + 0.12 * var(--mascot-scale-rot, 1)));
   }
   65% {
     /* Land, squash */
-    transform: translate3d(0, 3px, 0) scale(1.08, 0.92);
+    transform: translate3d(0, calc(3px * var(--mascot-scale-rot, 1)), 0) scale(calc(1 + 0.08 * var(--mascot-scale-rot, 1)), calc(1 - 0.08 * var(--mascot-scale-rot, 1)));
   }
   85% {
     /* Small bounce */
-    transform: translate3d(0, -4px, 0) scale(0.97, 1.03);
+    transform: translate3d(0, calc(-4px * var(--mascot-scale-rot, 1)), 0) scale(calc(1 - 0.03 * var(--mascot-scale-rot, 1)), calc(1 + 0.03 * var(--mascot-scale-rot, 1)));
   }
   100% {
     transform: translate3d(0, 0, 0) scale(1);
@@ -843,26 +855,26 @@
   15% {
     /* Anticipation: lean backward slightly (opposite direction of point-x/tilt) */
     transform: translate3d(
-      calc(var(--vip-point-x) * -0.3),
-      calc(var(--vip-point-y) * -0.3),
+      calc(var(--vip-point-x) * -0.3 * var(--mascot-scale-rot, 1)),
+      calc(var(--vip-point-y) * -0.3 * var(--mascot-scale-rot, 1)),
       0
-    ) rotate(calc(var(--vip-point-tilt) * -0.4));
+    ) rotate(calc(var(--vip-point-tilt) * -0.4 * var(--mascot-scale-rot, 1)));
   }
   45% {
     /* Point strongly forward */
     transform: translate3d(
-      var(--vip-point-x),
-      var(--vip-point-y),
+      calc(var(--vip-point-x) * var(--mascot-scale-rot, 1)),
+      calc(var(--vip-point-y) * var(--mascot-scale-rot, 1)),
       0
-    ) rotate(var(--vip-point-tilt));
+    ) rotate(calc(var(--vip-point-tilt) * var(--mascot-scale-rot, 1)));
   }
   85% {
     /* Keep holding point */
     transform: translate3d(
-      var(--vip-point-x),
-      var(--vip-point-y),
+      calc(var(--vip-point-x) * var(--mascot-scale-rot, 1)),
+      calc(var(--vip-point-y) * var(--mascot-scale-rot, 1)),
       0
-    ) rotate(var(--vip-point-tilt));
+    ) rotate(calc(var(--vip-point-tilt) * var(--mascot-scale-rot, 1)));
   }
   100% {
     transform: translate3d(0, 0, 0) rotate(0deg);
@@ -876,23 +888,23 @@
   }
   15% {
     /* Anticipation: tilt slightly to the left first */
-    transform: translate3d(0, 0, 0) rotate(-6deg);
+    transform: translate3d(0, 0, 0) rotate(calc(-6deg * var(--mascot-scale-rot, 1)));
   }
   35% {
     /* Swing right */
-    transform: translate3d(0, -1px, 0) rotate(12deg);
+    transform: translate3d(0, calc(-1px * var(--mascot-scale-rot, 1)), 0) rotate(calc(12deg * var(--mascot-scale-rot, 1)));
   }
   55% {
     /* Swing left */
-    transform: translate3d(0, 0, 0) rotate(-10deg);
+    transform: translate3d(0, 0, 0) rotate(calc(-10deg * var(--mascot-scale-rot, 1)));
   }
   75% {
     /* Swing right */
-    transform: translate3d(0, -1px, 0) rotate(8deg);
+    transform: translate3d(0, calc(-1px * var(--mascot-scale-rot, 1)), 0) rotate(calc(8deg * var(--mascot-scale-rot, 1)));
   }
   90% {
     /* Swing left */
-    transform: translate3d(0, 0, 0) rotate(-3deg);
+    transform: translate3d(0, 0, 0) rotate(calc(-3deg * var(--mascot-scale-rot, 1)));
   }
   100% {
     transform: translate3d(0, 0, 0) rotate(0deg);
@@ -903,17 +915,17 @@
 @keyframes vip-float-drift-reading {
   0%, 100% {
     transform: translate3d(
-      calc((var(--vip-move-x) + var(--vip-point-x)) * 0.4),
-      calc((var(--vip-move-y) + var(--vip-point-y)) * 0.4),
+      calc((var(--vip-move-x) + var(--vip-point-x)) * var(--mascot-scale, 0.4)),
+      calc((var(--vip-move-y) + var(--vip-point-y)) * var(--mascot-scale, 0.4)),
       0
-    ) rotate(calc((var(--vip-point-tilt) + var(--vip-tilt)) * 0.4));
+    ) rotate(calc((var(--vip-point-tilt) + var(--vip-tilt)) * var(--mascot-scale, 0.4)));
   }
   50% {
     transform: translate3d(
-      calc((var(--vip-move-x) + var(--vip-point-x)) * 0.4),
-      calc((var(--vip-move-y) + var(--vip-point-y) - 2px) * 0.4),
+      calc((var(--vip-move-x) + var(--vip-point-x)) * var(--mascot-scale, 0.4)),
+      calc((var(--vip-move-y) + var(--vip-point-y) - 2px) * var(--mascot-scale, 0.4)),
       0
-    ) rotate(calc((var(--vip-point-tilt) + var(--vip-tilt) - 0.48deg) * 0.4));
+    ) rotate(calc((var(--vip-point-tilt) + var(--vip-tilt) - 0.48deg) * var(--mascot-scale, 0.4)));
   }
 }
 
@@ -922,7 +934,7 @@
     transform: translateX(-50%) scale(1);
   }
   50% {
-    transform: translateX(-50%) scale(1.006, 0.994);
+    transform: translateX(-50%) scale(calc(1 + 0.006 * var(--mascot-scale-rot, 1)), calc(1 - 0.006 * var(--mascot-scale-rot, 1)));
   }
 }
 
@@ -932,18 +944,18 @@
     transform: translateX(-50%) scale(1);
   }
   30% {
-    transform: translateX(-50%) scale(1.05, 0.95) translateY(-3px);
+    transform: translateX(-50%) scale(calc(1 + 0.05 * var(--mascot-scale-rot, 1)), calc(1 - 0.05 * var(--mascot-scale-rot, 1))) translateY(calc(-3px * var(--mascot-scale-rot, 1)));
   }
   60% {
-    transform: translateX(-50%) scale(0.97, 1.03) translateY(1px);
+    transform: translateX(-50%) scale(calc(1 - 0.03 * var(--mascot-scale-rot, 1)), calc(1 + 0.03 * var(--mascot-scale-rot, 1))) translateY(calc(1px * var(--mascot-scale-rot, 1)));
   }
 }
 
 /* Listening entry bounce animation */
 @keyframes vip-listening-bounce-ani {
   0% { transform: translateX(-50%) scale(1); }
-  40% { transform: translateX(-50%) scale(1.06, 0.94) translateY(-4px); }
-  70% { transform: translateX(-50%) scale(0.96, 1.04) translateY(1px); }
+  40% { transform: translateX(-50%) scale(calc(1 + 0.06 * var(--mascot-scale-rot, 1)), calc(1 - 0.06 * var(--mascot-scale-rot, 1))) translateY(calc(-4px * var(--mascot-scale-rot, 1))); }
+  70% { transform: translateX(-50%) scale(calc(1 - 0.04 * var(--mascot-scale-rot, 1)), calc(1 + 0.04 * var(--mascot-scale-rot, 1))) translateY(calc(1px * var(--mascot-scale-rot, 1))); }
   100% { transform: translateX(-50%) scale(1); }
 }
 
