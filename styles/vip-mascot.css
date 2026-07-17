@@ -1,14 +1,24 @@
 :root {
-  --mascot-float-y: -5px;
+  --mascot-float-y: -6px;
   --mascot-scale: 0.4;
   --mascot-scale-rot: 1;
+
+  /* Official concept palette */
+  --vip-cream: #FFFDF0;
+  --vip-yellow-light: #FFF6CC;
+  --vip-yellow-mid: #FFEFA3;
+  --vip-yellow-deep: #FFD966;
+  --vip-glow: #FFD84D;
+  --vip-glow-soft: rgba(255, 216, 77, 0.42);
+  --vip-glow-bloom: rgba(255, 216, 77, 0.28);
+  --vip-blush: rgba(255, 168, 120, 0.16);
 }
 
 @media (max-width: 767px) {
   :root {
-    --mascot-float-y: -3.75px; /* -5px * 0.75 */
-    --mascot-scale: 0.3;      /* 0.4 * 0.75 */
-    --mascot-scale-rot: 0.75;  /* 25% reduction */
+    --mascot-float-y: -4.5px;
+    --mascot-scale: 0.3;
+    --mascot-scale-rot: 0.75;
   }
 }
 
@@ -36,28 +46,29 @@
 /* —— Shadow under the mascot (reacts to float) —— */
 .vip-mascot__shadow {
   position: absolute;
-  bottom: 2px;
+  bottom: 1px;
   left: 50%;
   transform: translateX(-50%);
-  width: 38px;
-  height: 5px;
+  width: 42px;
+  height: 6px;
   border-radius: 50%;
   background: radial-gradient(
     ellipse at center,
-    rgba(61, 46, 36, 0.22) 0%,
-    rgba(61, 46, 36, 0.08) 55%,
-    transparent 80%
+    rgba(255, 190, 90, 0.14) 0%,
+    rgba(120, 90, 55, 0.07) 48%,
+    transparent 82%
   );
+  filter: blur(1.5px);
   pointer-events: none;
   z-index: 1;
 }
 
 .vip-mascot--alive .vip-mascot__shadow {
-  animation: vip-shadow-breathe 7.5s ease-in-out infinite;
+  animation: vip-shadow-breathe 8.2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
 }
 
 .vip-mascot--sleepy .vip-mascot__shadow {
-  animation: vip-shadow-breathe-sleepy 12s ease-in-out infinite !important;
+  animation: vip-shadow-breathe-sleepy 13s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite !important;
 }
 
 /* —— Float container (translates and tilts) —— */
@@ -70,27 +81,29 @@
     calc(var(--vip-move-y) + var(--vip-point-y)),
     0
   ) rotate(calc(var(--vip-point-tilt) + var(--vip-tilt)));
-  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .vip-mascot--alive .vip-mascot__float {
-  animation: vip-float-drift 7.5s ease-in-out infinite;
+  animation: vip-float-drift 8.2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
 }
 
 .vip-mascot--sleepy .vip-mascot__float {
-  animation: vip-float-drift-sleepy 12s ease-in-out infinite !important;
+  animation: vip-float-drift-sleepy 13s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite !important;
 }
 
-.vip-mascot--typing .vip-mascot__float {
-  animation: vip-typing-wiggle 1.4s ease-in-out infinite;
-}
-
-.vip-mascot--giggle .vip-mascot__float {
-  animation: vip-gasp-bounce 0.8s cubic-bezier(0.25, 1.2, 0.5, 1) forwards;
+.vip-mascot--typing .vip-mascot__float,
+.vip-mascot--thinking .vip-mascot__float,
+.vip-mascot--curious .vip-mascot__float {
+  animation: vip-curious-lean 3.2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
 }
 
 .vip-mascot--celebrate .vip-mascot__float {
-  animation: vip-celebrate-jump 1s cubic-bezier(0.25, 1.3, 0.4, 1) forwards;
+  animation: vip-soft-bounce 0.78s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.vip-mascot--giggle .vip-mascot__float {
+  animation: vip-gasp-bounce 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 /* —— Companion Wrapper —— */
@@ -107,17 +120,18 @@
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 90px;
-  height: 90px;
+  width: 108px;
+  height: 108px;
   transform: translate(-50%, -50%);
   border-radius: 50%;
   background: radial-gradient(
     circle,
-    rgba(255, 243, 194, 0.35) 0%,
-    rgba(255, 232, 156, 0.15) 50%,
-    transparent 72%
+    var(--vip-glow-soft) 0%,
+    rgba(255, 239, 163, 0.22) 42%,
+    rgba(255, 216, 77, 0.08) 62%,
+    transparent 78%
   );
-  opacity: 0.85;
+  opacity: 1;
   pointer-events: none;
   z-index: 1;
   animation: vip-glow-pulse 6.8s ease-in-out infinite;
@@ -127,11 +141,20 @@
 .vip-mascot--celebrate .vip-companion__glow {
   background: radial-gradient(
     circle,
-    rgba(255, 243, 194, 0.55) 0%,
-    rgba(255, 232, 156, 0.3) 50%,
-    transparent 75%
+    rgba(255, 216, 77, 0.72) 0%,
+    rgba(255, 239, 163, 0.38) 48%,
+    rgba(255, 216, 77, 0.12) 68%,
+    transparent 82%
   );
-  animation: vip-glow-burst 1.2s ease-out forwards;
+  animation: vip-glow-burst 1.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Curious / thinking — warm attention glow */
+.vip-mascot--curious .vip-companion__glow,
+.vip-mascot--thinking .vip-companion__glow,
+.vip-mascot--typing .vip-companion__glow {
+  opacity: 1;
+  animation: vip-glow-curious 2.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
 }
 
 /* —— Top Accessories Container —— */
@@ -154,20 +177,63 @@
   justify-content: center;
   opacity: 0;
   transform: scale(0.65) translateY(6px);
-  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  color: #FFE89C;
+  transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1), transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  color: var(--vip-yellow-deep);
 }
 
-/* 1. Bulb (Thinking/Typing) */
+/* 1. Bulb / lamp (Thinking/Typing) */
 .vip-mascot--typing .vip-accessory__bulb,
-.vip-mascot--thinking .vip-accessory__bulb {
+.vip-mascot--thinking .vip-accessory__bulb,
+.vip-mascot--curious .vip-accessory__bulb {
   opacity: 1;
-  transform: scale(1) translateY(0);
+  animation: vip-bulb-sway 9s ease-in-out infinite;
+}
+
+.vip-accessory__bulb {
+  filter: drop-shadow(0 0 6px var(--vip-glow-bloom));
+  transform-origin: 50% 100%;
 }
 
 .vip-accessory__bulb svg {
-  animation: vip-bulb-glow-pulse 1.8s ease-in-out infinite;
-  filter: drop-shadow(0 0 4px rgba(255, 232, 156, 0.75));
+  animation:
+    vip-bulb-glow-pulse 3.4s ease-in-out infinite,
+    vip-bulb-sparkle 6.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 5px rgba(255, 216, 77, 0.85));
+}
+
+/* Lamp light particles */
+.vip-mascot--typing .vip-accessory__bulb::before,
+.vip-mascot--thinking .vip-accessory__bulb::before,
+.vip-mascot--curious .vip-accessory__bulb::before,
+.vip-mascot--typing .vip-accessory__bulb::after,
+.vip-mascot--thinking .vip-accessory__bulb::after,
+.vip-mascot--curious .vip-accessory__bulb::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  background: var(--vip-glow);
+  box-shadow: 0 0 4px rgba(255, 216, 77, 0.75);
+  pointer-events: none;
+}
+
+.vip-mascot--typing .vip-accessory__bulb::before,
+.vip-mascot--thinking .vip-accessory__bulb::before,
+.vip-mascot--curious .vip-accessory__bulb::before {
+  left: 2px;
+  top: 6px;
+  width: 2.5px;
+  height: 2.5px;
+  animation: vip-lamp-particle 2.8s ease-out infinite;
+}
+
+.vip-mascot--typing .vip-accessory__bulb::after,
+.vip-mascot--thinking .vip-accessory__bulb::after,
+.vip-mascot--curious .vip-accessory__bulb::after {
+  right: 3px;
+  top: 8px;
+  width: 2px;
+  height: 2px;
+  animation: vip-lamp-particle 3.4s ease-out infinite 1.1s;
 }
 
 /* 2. Sparkle (Recommendation) */
@@ -178,7 +244,7 @@
 
 .vip-accessory__sparkle svg {
   animation: vip-sparkle-shimmer 1.4s ease-in-out infinite;
-  filter: drop-shadow(0 0 5px rgba(255, 232, 156, 0.85));
+  filter: drop-shadow(0 0 5px rgba(255, 216, 77, 0.85));
 }
 
 /* 3. Orbiting dots (Loading) */
@@ -196,8 +262,8 @@
   width: 4.5px;
   height: 4.5px;
   border-radius: 50%;
-  background: #FFE89C;
-  box-shadow: 0 0 4px rgba(255, 232, 156, 0.65);
+  background: var(--vip-yellow-deep);
+  box-shadow: 0 0 4px rgba(255, 216, 77, 0.65);
 }
 
 .vip-accessory__dots span:nth-child(1) {
@@ -224,7 +290,7 @@
 
 .vip-accessory__star svg {
   animation: vip-star-pop 1.5s ease-in-out infinite;
-  filter: drop-shadow(0 0 6px rgba(255, 232, 156, 0.95));
+  filter: drop-shadow(0 0 6px rgba(255, 216, 77, 0.95));
 }
 
 /* 5. Hover & Celebrate (Floating Particles) */
@@ -240,7 +306,7 @@
   width: 3.5px;
   height: 3.5px;
   border-radius: 50%;
-  background: #FFE89C;
+  background: var(--vip-glow);
   opacity: 0;
 }
 
@@ -280,34 +346,39 @@
   width: 52px;
   height: 56px;
   transform: translateX(-50%);
-  border-radius: 50% 50% 45% 45% / 54% 54% 44% 44%;
-  background: 
-    radial-gradient(circle at 35% 25%, #FFFBE8 0%, rgba(255, 251, 232, 0) 70%),
-    radial-gradient(circle at 50% 100%, #FFF3C2 20%, #FFE89C 100%);
+  border-radius: 52% 52% 46% 46% / 56% 56% 42% 42%;
+  background:
+    radial-gradient(circle at 32% 22%, var(--vip-cream) 0%, rgba(255, 253, 240, 0) 68%),
+    radial-gradient(circle at 68% 78%, var(--vip-yellow-light) 0%, rgba(255, 246, 204, 0) 55%),
+    radial-gradient(circle at 50% 100%, var(--vip-yellow-mid) 18%, var(--vip-yellow-deep) 100%);
   box-shadow:
-    inset 0 -3px 8px rgba(184, 140, 60, 0.22),
-    inset 0 3px 6px #FFFBE8,
-    0 5px 14px rgba(184, 140, 60, 0.12),
-    0 1px 2px rgba(184, 140, 60, 0.05);
-  filter: drop-shadow(0 0 6px rgba(255, 243, 194, 0.5));
+    inset 0 -2px 6px rgba(255, 190, 80, 0.12),
+    inset 0 4px 8px rgba(255, 253, 240, 0.85),
+    0 4px 16px var(--vip-glow-bloom),
+    0 8px 28px rgba(255, 216, 77, 0.18),
+    0 1px 2px rgba(255, 190, 80, 0.06);
+  filter:
+    drop-shadow(0 0 7px rgba(255, 216, 77, 0.55))
+    drop-shadow(0 0 14px rgba(255, 216, 77, 0.22));
   z-index: 2;
-  animation: vip-body-breathe 4.5s ease-in-out infinite;
+  animation: vip-body-breathe 5.2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
 }
 
 /* Glassmorphic sheen */
 .vip-companion__sheen {
   position: absolute;
-  left: 8%;
-  top: 8%;
-  width: 22px;
-  height: 18px;
+  left: 10%;
+  top: 10%;
+  width: 24px;
+  height: 20px;
   border-radius: 50%;
   background: radial-gradient(
     circle at 35% 35%,
-    rgba(255, 251, 232, 0.75),
-    transparent 65%
+    rgba(255, 253, 240, 0.92),
+    rgba(255, 246, 204, 0.35) 45%,
+    transparent 68%
   );
-  opacity: 0.85;
+  opacity: 0.9;
   pointer-events: none;
 }
 
@@ -319,12 +390,12 @@
   transform: translateY(-50%);
   width: 9px;
   height: 14px;
-  border: 1.8px solid #FFE89C;
+  border: 1.8px solid var(--vip-yellow-mid);
   border-left: none;
   border-radius: 0 10px 10px 0 / 0 8px 8px 0;
   background: transparent;
   pointer-events: none;
-  box-shadow: inset -1px 0 0 rgba(255, 251, 232, 0.6);
+  box-shadow: inset -1px 0 0 rgba(255, 253, 240, 0.7);
 }
 
 .vip-companion__cup-brim {
@@ -335,9 +406,9 @@
   width: 36px;
   height: 4px;
   border-radius: 50%;
-  background: linear-gradient(90deg, #7a5c4a 0%, #3d2e24 100%);
-  opacity: 0.65;
-  border-bottom: 1.2px solid #FFFBE8;
+  background: linear-gradient(90deg, #8a6a52 0%, #4a382c 100%);
+  opacity: 0.55;
+  border-bottom: 1.2px solid var(--vip-cream);
 }
 
 /* Cute Tapered Spirit Tail */
@@ -348,9 +419,9 @@
   transform: translateX(-50%);
   width: 14px;
   height: 10px;
-  background: #FFE89C;
+  background: linear-gradient(180deg, var(--vip-yellow-mid) 0%, var(--vip-yellow-deep) 100%);
   border-radius: 0 0 50% 50% / 0 0 100% 100%;
-  box-shadow: 0 1px 2px rgba(184, 140, 60, 0.15);
+  box-shadow: 0 1px 3px rgba(255, 190, 80, 0.12);
   z-index: -1;
 }
 
@@ -361,12 +432,34 @@
   z-index: 3;
 }
 
+/* Subtle warm blush — almost invisible */
+.vip-companion__face::before,
+.vip-companion__face::after {
+  content: "";
+  position: absolute;
+  top: 47%;
+  width: 9px;
+  height: 6px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--vip-blush) 0%, transparent 72%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.vip-companion__face::before {
+  left: 16%;
+}
+
+.vip-companion__face::after {
+  right: 16%;
+}
+
 .vip-companion__eyes {
   position: absolute;
-  top: 31%;
+  top: 30%;
   left: 50%;
-  width: 32px;
-  height: 14px;
+  width: 36px;
+  height: 16px;
   transform: translateX(-50%);
   display: flex;
   justify-content: space-between;
@@ -375,8 +468,8 @@
 
 .vip-eye {
   position: relative;
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
 }
 
 .vip-eye__ball {
@@ -385,11 +478,15 @@
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  background: #FFFBE8;
-  border: 1px solid rgba(184, 140, 60, 0.15);
+  background:
+    radial-gradient(circle at 32% 28%, var(--vip-cream) 0%, var(--vip-yellow-light) 52%, var(--vip-yellow-mid) 100%);
+  border: 1px solid rgba(255, 190, 90, 0.12);
   overflow: hidden;
-  box-shadow: inset 0 -1.5px 3px rgba(184, 140, 60, 0.1);
-  transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+  box-shadow:
+    inset 0 -2px 4px rgba(255, 170, 70, 0.07),
+    inset 0 2px 5px rgba(255, 255, 255, 0.72),
+    0 1px 2px rgba(255, 216, 77, 0.15);
+  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .vip-eye__lid {
@@ -397,7 +494,7 @@
   inset: 0;
   z-index: 2;
   border-radius: inherit;
-  background: #FFE89C;
+  background: var(--vip-yellow-mid);
   transform-origin: center top;
   transform: scaleY(0);
   transition: transform 0.2s ease;
@@ -408,13 +505,13 @@
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 6.5px;
-  height: 6.5px;
-  margin: -3.25px 0 0 -3.25px;
+  width: 7px;
+  height: 7px;
+  margin: -3.5px 0 0 -3.5px;
   border-radius: 50%;
-  background: var(--cafe-coffee);
+  background: radial-gradient(circle at 35% 30%, #5a4335 0%, var(--cafe-coffee) 65%);
   transform: translate(var(--vip-look-x), var(--vip-look-y));
-  transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+  transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .vip-mascot--look-target .vip-pupil {
@@ -423,22 +520,35 @@
 
 .vip-eye__shine {
   position: absolute;
-  left: 2px;
+  left: 2.5px;
   top: 2px;
-  width: 2.2px;
-  height: 2.2px;
+  width: 3.5px;
+  height: 3.5px;
   border-radius: 50%;
-  background: #FFFBE8;
-  opacity: 0.95;
+  background: radial-gradient(circle, #fff 0%, var(--vip-cream) 55%, transparent 100%);
+  opacity: 0.98;
   z-index: 1;
+  box-shadow: 0 0 2px rgba(255, 255, 255, 0.8);
+}
+
+.vip-eye__shine::after {
+  content: "";
+  position: absolute;
+  right: -3px;
+  bottom: -2px;
+  width: 1.8px;
+  height: 1.8px;
+  border-radius: 50%;
+  background: rgba(255, 253, 240, 0.88);
+  box-shadow: 0 0 1px rgba(255, 255, 255, 0.6);
 }
 
 /* Eyebrows container and items */
 .vip-companion__eyebrows {
   position: absolute;
-  top: 22%;
+  top: 21%;
   left: 50%;
-  width: 32px;
+  width: 36px;
   height: 6px;
   transform: translateX(-50%);
   display: flex;
@@ -448,12 +558,12 @@
 }
 
 .vip-eyebrow {
-  width: 8px;
-  height: 1.5px;
-  background: var(--cafe-coffee);
-  border-radius: 1px;
-  opacity: 0.65;
-  transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+  width: 9px;
+  height: 1.2px;
+  background: linear-gradient(90deg, transparent, rgba(90, 67, 53, 0.42), transparent);
+  border-radius: 50%;
+  opacity: 0.48;
+  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.32s ease;
 }
 
 /* Eyebrow emotional states */
@@ -494,13 +604,19 @@
 .vip-mouth {
   position: absolute;
   left: 50%;
-  top: 51%;
+  top: 52%;
   transform: translateX(-50%);
-  width: 8px;
-  height: 4px;
-  border-bottom: 2px solid var(--cafe-coffee);
-  border-radius: 0 0 8px 8px;
-  transition: width 0.25s ease, height 0.25s ease, border-radius 0.25s ease, background 0.25s ease, border 0.25s ease, transform 0.25s ease;
+  width: 10px;
+  height: 4.5px;
+  border-bottom: 2px solid rgba(90, 67, 53, 0.82);
+  border-radius: 0 0 10px 10px;
+  transition:
+    width 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    border-radius 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.32s ease,
+    border 0.32s ease,
+    transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* —— Blinking Micro-animation —— */
@@ -525,13 +641,13 @@
 
 /* 1. Smile (Default) -> handles normally */
 
-/* 2. Thinking Face (data-expression="think") */
+/* 2. Thinking / curious — slightly wider eyes, soft focus up */
 .vip-companion[data-expression="think"] .vip-eye__ball {
-  transform: scaleY(0.9);
+  transform: scale(1.08);
 }
 
 .vip-companion[data-expression="think"] .vip-pupil {
-  transform: translate(var(--vip-look-x), -1.2px) !important;
+  transform: translate(var(--vip-look-x), calc(var(--vip-look-y) - 1.1px)) !important;
 }
 
 .vip-companion[data-expression="think"] .vip-mouth {
@@ -541,6 +657,13 @@
   background: var(--cafe-coffee);
   border: none;
   top: 53%;
+}
+
+/* Curious lean state — eyes open a touch wider while waiting */
+.vip-mascot--curious .vip-eye__ball,
+.vip-mascot--thinking .vip-eye__ball,
+.vip-mascot--typing .vip-eye__ball {
+  transform: scale(1.07);
 }
 
 /* 3. Happy Closed Arch Eyes (data-expression="happy") */
@@ -558,17 +681,17 @@
 .vip-companion[data-expression="happy"] .vip-eye__lid {
   transform: scaleY(1);
   background: transparent;
-  border-top: 2.2px solid var(--cafe-coffee);
-  border-radius: 8px 8px 0 0;
-  height: 6px;
-  top: 3.5px;
+  border-top: 2.2px solid rgba(90, 67, 53, 0.82);
+  border-radius: 9px 9px 0 0;
+  height: 7px;
+  top: 4px;
 }
 
 .vip-companion[data-expression="happy"] .vip-mouth {
-  width: 11px;
+  width: 12px;
   height: 5.5px;
-  border-bottom: 2.5px solid var(--cafe-coffee);
-  border-radius: 0 0 11px 11px;
+  border-bottom: 2.5px solid rgba(90, 67, 53, 0.82);
+  border-radius: 0 0 12px 12px;
 }
 
 /* 4. Surprised O Face (data-expression="surprised") */
@@ -627,6 +750,26 @@
   border-radius: 0 0 12px 12px;
 }
 
+/* 7b. Proud Face (recommendation) */
+.vip-companion[data-expression="proud"] .vip-eyebrow--left {
+  transform: translateY(-1.4px) rotate(-8deg);
+}
+
+.vip-companion[data-expression="proud"] .vip-eyebrow--right {
+  transform: translateY(-1.4px) rotate(8deg);
+}
+
+.vip-companion[data-expression="proud"] .vip-eye__ball {
+  transform: scaleY(0.94) scaleX(1.03);
+}
+
+.vip-companion[data-expression="proud"] .vip-mouth {
+  width: 10px;
+  height: 5px;
+  border-bottom: 2.2px solid var(--cafe-coffee);
+  border-radius: 0 0 10px 10px;
+}
+
 /* 8. Confused Face (data-expression="confused") */
 .vip-companion[data-expression="confused"] .vip-eye--left .vip-eye__ball {
   transform: scaleY(0.8);
@@ -655,13 +798,13 @@
 
 /* Head tilt status class on root */
 .vip-mascot--tilt .vip-companion {
-  transform: rotate(6deg);
-  transition: transform 0.35s cubic-bezier(0.25, 1.15, 0.5, 1);
+  transform: rotate(4.5deg);
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* —— Keyframe Animations —— */
 
-/* Body float drift */
+/* Body float drift — slow spirit lift */
 @keyframes vip-float-drift {
   0%, 100% {
     transform: translate3d(
@@ -673,9 +816,9 @@
   50% {
     transform: translate3d(
       calc(var(--vip-move-x) + var(--vip-point-x)),
-      calc(var(--vip-move-y) + var(--vip-point-y) - 5px),
+      calc(var(--vip-move-y) + var(--vip-point-y) - 6px),
       0
-    ) rotate(calc(var(--vip-point-tilt) + var(--vip-tilt) - 1.2deg));
+    ) rotate(calc(var(--vip-point-tilt) + var(--vip-tilt) - 1.1deg));
   }
 }
 
@@ -684,53 +827,101 @@
     transform: translate3d(0, 0, 0) rotate(0deg);
   }
   50% {
-    transform: translate3d(0, -3px, 0) rotate(-0.5deg);
+    transform: translate3d(0, -3.5px, 0) rotate(-0.5deg);
   }
 }
 
-/* Inverse shadow breathing */
+/* Soft floating shadow — stretches when spirit rises */
 @keyframes vip-shadow-breathe {
   0%, 100% {
-    transform: translateX(-50%) scale(1);
-    opacity: 1;
+    transform: translateX(-50%) scale(1, 1);
+    opacity: 0.62;
   }
   50% {
-    transform: translateX(-50%) scale(0.85);
-    opacity: 0.5;
+    transform: translateX(-50%) scale(1.28, 0.68);
+    opacity: 0.34;
   }
 }
 
 @keyframes vip-shadow-breathe-sleepy {
   0%, 100% {
-    transform: translateX(-50%) scale(1);
-    opacity: 1;
+    transform: translateX(-50%) scale(1, 1);
+    opacity: 0.55;
   }
   50% {
-    transform: translateX(-50%) scale(0.92);
-    opacity: 0.7;
+    transform: translateX(-50%) scale(1.12, 0.82);
+    opacity: 0.42;
   }
 }
 
-/* Organic breathing scale */
+/* Organic breathing scale — fluffy squash */
 @keyframes vip-body-breathe {
   0%, 100% {
     transform: translateX(-50%) scale(1);
   }
   50% {
-    transform: translateX(-50%) scale(1.015, 0.985);
+    transform: translateX(-50%) scale(1.018, 0.982);
   }
 }
 
-/* Typing micro-wiggle */
-@keyframes vip-typing-wiggle {
+/* Curious lean — slight forward attention while assistant types */
+@keyframes vip-curious-lean {
   0%, 100% {
-    transform: translate3d(0, 0, 0) rotate(0deg);
+    transform: translate3d(
+      calc(var(--vip-move-x) + var(--vip-point-x)),
+      calc(var(--vip-move-y) + var(--vip-point-y)),
+      0
+    ) rotate(calc(var(--vip-point-tilt) + var(--vip-tilt)));
   }
-  25% {
-    transform: translate3d(-1px, -2px, 0) rotate(-0.8deg);
+  50% {
+    transform: translate3d(
+      calc(var(--vip-move-x) + var(--vip-point-x) + 1.5px),
+      calc(var(--vip-move-y) + var(--vip-point-y) - 1.5px),
+      0
+    ) rotate(calc(var(--vip-point-tilt) + var(--vip-tilt) + 1.5deg));
   }
-  75% {
-    transform: translate3d(1px, -1px, 0) rotate(0.8deg);
+}
+
+/* Soft celebrate bounce — tiny, warm, not cartoon */
+@keyframes vip-soft-bounce {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  40% {
+    transform: translate3d(0, calc(-4px * var(--mascot-scale-rot, 1)), 0)
+      scale(calc(1 - 0.025 * var(--mascot-scale-rot, 1)), calc(1 + 0.025 * var(--mascot-scale-rot, 1)));
+  }
+  70% {
+    transform: translate3d(0, calc(0.5px * var(--mascot-scale-rot, 1)), 0) scale(1);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+/* Nod — quick reply acknowledgment */
+@keyframes vip-nod-once {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  40% {
+    transform: rotate(calc(4deg * var(--mascot-scale-rot, 1)));
+  }
+  68% {
+    transform: rotate(calc(-1deg * var(--mascot-scale-rot, 1)));
+  }
+}
+
+/* Idle body sway */
+@keyframes vip-body-sway {
+  0%, 100% {
+    transform: translateX(-50%) rotate(0deg);
+  }
+  35% {
+    transform: translateX(calc(-50% + 0.8px)) rotate(calc(0.9deg * var(--mascot-scale-rot, 1)));
+  }
+  70% {
+    transform: translateX(calc(-50% - 0.8px)) rotate(calc(-0.75deg * var(--mascot-scale-rot, 1)));
   }
 }
 
@@ -766,55 +957,104 @@
   }
 }
 
-/* Bulb pulse scale */
+/* Bulb / lamp — slow pulse, gentle sway, occasional sparkle */
 @keyframes vip-bulb-glow-pulse {
   0%, 100% {
-    transform: scale(0.9);
-    opacity: 0.8;
+    transform: scale(0.94);
+    opacity: 0.82;
   }
   50% {
-    transform: scale(1.08);
+    transform: scale(1.06);
     opacity: 1;
+  }
+}
+
+@keyframes vip-bulb-sway {
+  0%, 100% {
+    transform: scale(1) translateY(0) rotate(-4deg);
+  }
+  50% {
+    transform: scale(1) translateY(0) rotate(4deg);
+  }
+}
+
+@keyframes vip-bulb-sparkle {
+  0%, 78%, 100% {
+    filter: drop-shadow(0 0 5px rgba(255, 216, 77, 0.85));
+  }
+  82% {
+    filter: drop-shadow(0 0 10px rgba(255, 253, 240, 1)) drop-shadow(0 0 14px rgba(255, 216, 77, 0.95));
+  }
+  88% {
+    filter: drop-shadow(0 0 6px rgba(255, 216, 77, 0.9));
+  }
+}
+
+@keyframes vip-lamp-particle {
+  0% {
+    transform: translateY(0) scale(0.6);
+    opacity: 0;
+  }
+  18% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: translateY(-14px) scale(0.2);
+    opacity: 0;
   }
 }
 
 /* Glow ambient pulse */
 @keyframes vip-glow-pulse {
   0%, 100% {
-    transform: translate(-50%, -50%) scale(0.94);
-    opacity: 0.7;
+    transform: translate(-50%, -50%) scale(0.96);
+    opacity: 0.78;
   }
   50% {
-    transform: translate(-50%, -50%) scale(1.06);
-    opacity: 0.95;
+    transform: translate(-50%, -50%) scale(1.08);
+    opacity: 1;
   }
 }
 
-/* Glow recommend burst */
+/* Curious attention glow while assistant types */
+@keyframes vip-glow-curious {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(0.98);
+    opacity: 0.88;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.08);
+    opacity: 1;
+  }
+}
+
+/* Glow recommend / celebrate burst */
 @keyframes vip-glow-burst {
   0% {
-    transform: translate(-50%, -50%) scale(0.7);
-    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.82);
+    opacity: 0.35;
   }
-  30% {
+  35% {
     opacity: 1;
   }
   100% {
-    transform: translate(-50%, -50%) scale(1.15);
-    opacity: 0.8;
+    transform: translate(-50%, -50%) scale(1.12);
+    opacity: 0.85;
   }
 }
 
-/* Gasp bounce click reaction */
+/* Gasp bounce — click reaction, kept gentle */
 @keyframes vip-gasp-bounce {
   0% {
     transform: translate3d(0, 0, 0) scale(1);
   }
-  30% {
-    transform: translate3d(0, calc(-9px * var(--mascot-scale-rot, 1)), 0) scale(calc(1 + 0.08 * var(--mascot-scale-rot, 1)), calc(1 - 0.08 * var(--mascot-scale-rot, 1)));
+  35% {
+    transform: translate3d(0, calc(-5px * var(--mascot-scale-rot, 1)), 0)
+      scale(calc(1 + 0.04 * var(--mascot-scale-rot, 1)), calc(1 - 0.04 * var(--mascot-scale-rot, 1)));
   }
-  60% {
-    transform: translate3d(0, calc(2px * var(--mascot-scale-rot, 1)), 0) scale(calc(1 - 0.05 * var(--mascot-scale-rot, 1)), calc(1 + 0.05 * var(--mascot-scale-rot, 1)));
+  65% {
+    transform: translate3d(0, calc(1px * var(--mascot-scale-rot, 1)), 0)
+      scale(calc(1 - 0.025 * var(--mascot-scale-rot, 1)), calc(1 + 0.025 * var(--mascot-scale-rot, 1)));
   }
   100% {
     transform: translate3d(0, 0, 0) scale(1);
@@ -847,29 +1087,26 @@
   }
 }
 
-/* Pointing animation: leans back slightly (anticipation), then springs forward */
+/* Pointing — soft anticipation, then calm lean toward card */
 @keyframes vip-pointing-ani {
   0% {
     transform: translate3d(0, 0, 0) rotate(0deg);
   }
-  15% {
-    /* Anticipation: lean backward slightly (opposite direction of point-x/tilt) */
+  18% {
     transform: translate3d(
-      calc(var(--vip-point-x) * -0.3 * var(--mascot-scale-rot, 1)),
-      calc(var(--vip-point-y) * -0.3 * var(--mascot-scale-rot, 1)),
+      calc(var(--vip-point-x) * -0.2 * var(--mascot-scale-rot, 1)),
+      calc(var(--vip-point-y) * -0.2 * var(--mascot-scale-rot, 1)),
       0
-    ) rotate(calc(var(--vip-point-tilt) * -0.4 * var(--mascot-scale-rot, 1)));
+    ) rotate(calc(var(--vip-point-tilt) * -0.25 * var(--mascot-scale-rot, 1)));
   }
-  45% {
-    /* Point strongly forward */
+  48% {
     transform: translate3d(
       calc(var(--vip-point-x) * var(--mascot-scale-rot, 1)),
       calc(var(--vip-point-y) * var(--mascot-scale-rot, 1)),
       0
     ) rotate(calc(var(--vip-point-tilt) * var(--mascot-scale-rot, 1)));
   }
-  85% {
-    /* Keep holding point */
+  88% {
     transform: translate3d(
       calc(var(--vip-point-x) * var(--mascot-scale-rot, 1)),
       calc(var(--vip-point-y) * var(--mascot-scale-rot, 1)),
@@ -881,30 +1118,24 @@
   }
 }
 
-/* Waving animation: tilts back slightly (anticipation) then wiggles side-to-side */
+/* Wave — gentle side tilt, Nintendo-soft not cartoon flap */
 @keyframes vip-wave-ani {
   0% {
     transform: translate3d(0, 0, 0) rotate(0deg);
   }
-  15% {
-    /* Anticipation: tilt slightly to the left first */
+  18% {
+    transform: translate3d(0, 0, 0) rotate(calc(-4deg * var(--mascot-scale-rot, 1)));
+  }
+  40% {
+    transform: translate3d(0, calc(-0.5px * var(--mascot-scale-rot, 1)), 0)
+      rotate(calc(8deg * var(--mascot-scale-rot, 1)));
+  }
+  62% {
     transform: translate3d(0, 0, 0) rotate(calc(-6deg * var(--mascot-scale-rot, 1)));
   }
-  35% {
-    /* Swing right */
-    transform: translate3d(0, calc(-1px * var(--mascot-scale-rot, 1)), 0) rotate(calc(12deg * var(--mascot-scale-rot, 1)));
-  }
-  55% {
-    /* Swing left */
-    transform: translate3d(0, 0, 0) rotate(calc(-10deg * var(--mascot-scale-rot, 1)));
-  }
-  75% {
-    /* Swing right */
-    transform: translate3d(0, calc(-1px * var(--mascot-scale-rot, 1)), 0) rotate(calc(8deg * var(--mascot-scale-rot, 1)));
-  }
-  90% {
-    /* Swing left */
-    transform: translate3d(0, 0, 0) rotate(calc(-3deg * var(--mascot-scale-rot, 1)));
+  82% {
+    transform: translate3d(0, calc(-0.5px * var(--mascot-scale-rot, 1)), 0)
+      rotate(calc(4deg * var(--mascot-scale-rot, 1)));
   }
   100% {
     transform: translate3d(0, 0, 0) rotate(0deg);
@@ -923,9 +1154,9 @@
   50% {
     transform: translate3d(
       calc((var(--vip-move-x) + var(--vip-point-x)) * var(--mascot-scale, 0.4)),
-      calc((var(--vip-move-y) + var(--vip-point-y) - 2px) * var(--mascot-scale, 0.4)),
+      calc((var(--vip-move-y) + var(--vip-point-y) - 3px) * var(--mascot-scale, 0.4)),
       0
-    ) rotate(calc((var(--vip-point-tilt) + var(--vip-tilt) - 0.48deg) * var(--mascot-scale, 0.4)));
+    ) rotate(calc((var(--vip-point-tilt) + var(--vip-tilt) - 0.66deg) * var(--mascot-scale, 0.4)));
   }
 }
 
@@ -943,19 +1174,31 @@
   0%, 100% {
     transform: translateX(-50%) scale(1);
   }
-  30% {
-    transform: translateX(-50%) scale(calc(1 + 0.05 * var(--mascot-scale-rot, 1)), calc(1 - 0.05 * var(--mascot-scale-rot, 1))) translateY(calc(-3px * var(--mascot-scale-rot, 1)));
+  35% {
+    transform: translateX(-50%)
+      scale(calc(1 + 0.03 * var(--mascot-scale-rot, 1)), calc(1 - 0.03 * var(--mascot-scale-rot, 1)))
+      translateY(calc(-2px * var(--mascot-scale-rot, 1)));
   }
-  60% {
-    transform: translateX(-50%) scale(calc(1 - 0.03 * var(--mascot-scale-rot, 1)), calc(1 + 0.03 * var(--mascot-scale-rot, 1))) translateY(calc(1px * var(--mascot-scale-rot, 1)));
+  65% {
+    transform: translateX(-50%)
+      scale(calc(1 - 0.015 * var(--mascot-scale-rot, 1)), calc(1 + 0.015 * var(--mascot-scale-rot, 1)))
+      translateY(calc(0.5px * var(--mascot-scale-rot, 1)));
   }
 }
 
 /* Listening entry bounce animation */
 @keyframes vip-listening-bounce-ani {
   0% { transform: translateX(-50%) scale(1); }
-  40% { transform: translateX(-50%) scale(calc(1 + 0.06 * var(--mascot-scale-rot, 1)), calc(1 - 0.06 * var(--mascot-scale-rot, 1))) translateY(calc(-4px * var(--mascot-scale-rot, 1))); }
-  70% { transform: translateX(-50%) scale(calc(1 - 0.04 * var(--mascot-scale-rot, 1)), calc(1 + 0.04 * var(--mascot-scale-rot, 1))) translateY(calc(1px * var(--mascot-scale-rot, 1))); }
+  40% {
+    transform: translateX(-50%)
+      scale(calc(1 + 0.035 * var(--mascot-scale-rot, 1)), calc(1 - 0.035 * var(--mascot-scale-rot, 1)))
+      translateY(calc(-2.5px * var(--mascot-scale-rot, 1)));
+  }
+  72% {
+    transform: translateX(-50%)
+      scale(calc(1 - 0.02 * var(--mascot-scale-rot, 1)), calc(1 + 0.02 * var(--mascot-scale-rot, 1)))
+      translateY(calc(0.5px * var(--mascot-scale-rot, 1)));
+  }
   100% { transform: translateX(-50%) scale(1); }
 }
 
@@ -989,12 +1232,12 @@
 
 /* Pointing reaction on float container */
 .vip-mascot--pointing .vip-mascot__float {
-  animation: vip-pointing-ani 2.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation: vip-pointing-ani 1.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 /* Waving reaction on float container */
 .vip-mascot--wave .vip-mascot__float {
-  animation: vip-wave-ani 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation: vip-wave-ani 1.15s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 /* Reading mode override */
@@ -1014,12 +1257,35 @@
 
 /* Micro bounce keyframes for idle expressions */
 .vip-mascot--micro-bounce .vip-companion__body {
-  animation: vip-micro-bounce-ani 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation: vip-micro-bounce-ani 0.64s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Nod — quick reply */
+.vip-mascot--nod .vip-companion {
+  animation: vip-nod-once 0.58s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Idle body sway */
+.vip-mascot--sway .vip-companion__body {
+  animation: vip-body-sway 1.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) forwards;
+}
+
+/* Goodbye — brief eye close after wave */
+.vip-mascot--goodbye .vip-eye__lid {
+  transform: scaleY(1);
+  background: var(--vip-yellow-mid);
+  transition: transform 0.4s cubic-bezier(0.45, 0.05, 0.55, 0.95);
+}
+
+.vip-mascot--goodbye .vip-pupil,
+.vip-mascot--goodbye .vip-eye__shine {
+  opacity: 0;
+  transition: opacity 0.35s ease;
 }
 
 /* Listening state bounce */
 .vip-mascot--listening-bounce .vip-companion__body {
-  animation: vip-listening-bounce-ani 0.5s ease-out;
+  animation: vip-listening-bounce-ani 0.48s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* Particle drift hover effect */
@@ -1042,7 +1308,7 @@
   0%, 100% {
     transform: scaleY(0);
   }
-  45%, 55% {
+  42%, 58% {
     transform: scaleY(1);
   }
 }
@@ -1067,7 +1333,10 @@
   .vip-mascot__shadow,
   .vip-companion__body,
   .vip-companion__glow,
+  .vip-accessory__bulb,
   .vip-accessory__bulb svg,
+  .vip-accessory__bulb::before,
+  .vip-accessory__bulb::after,
   .vip-accessory__sparkle svg,
   .vip-accessory__dots,
   .vip-accessory__star svg,

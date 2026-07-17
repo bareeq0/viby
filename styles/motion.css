@@ -212,25 +212,7 @@
 }
 
 /* —— Mascot float sync —— */
-
-.vip-mascot__float {
-  animation: vip-float-soft var(--dur-float) ease-in-out infinite;
-}
-
-@keyframes vip-float-soft {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0);
-  }
-  50% {
-    transform: translate3d(0, var(--mascot-float-y, -5px), 0);
-  }
-}
-
-.vip-mascot--user .vip-companion__body,
-.vip-mascot--assistant .vip-companion__body {
-  animation-timing-function: var(--ease-spring-soft);
-}
+/* Float/breathe handled in vip-mascot.css when --alive */
 
 @media (prefers-reduced-motion: reduce) {
   .message--enter,

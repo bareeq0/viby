@@ -20,7 +20,7 @@ import {
   delay,
 } from "../components/chat-sequence.js";
 import { setSplashCafeName, runSplash } from "../components/splash.js";
-import { mountVipMascot, reactToUserMessage, reactToCelebrate, reactToLoading, reactToRejectFeedback, reactToRejectPrompt, reactToListening, glanceAtMenu, lookAtReplyDock } from "../components/vip-mascot.js";
+import { mountVipMascot, reactToUserMessage, reactToGoodbye, reactToLoading, reactToRejectFeedback, reactToRejectPrompt, reactToListening, reactToQuickReply, glanceAtMenu, lookAtReplyDock } from "../components/vip-mascot.js";
 import { isRejectAnswer } from "./flows.js";
 import { registerServiceWorker } from "./pwa.js";
 import { initPlatform, refreshPlatformContext, getPlatformDeps } from "../platform/bootstrap.js";
@@ -110,6 +110,7 @@ async function handleBubbleReply(value, label) {
   setRepliesEnabled(false);
   setQuickReplies([], () => {});
   reactToListening(false);
+  reactToQuickReply();
 
   renderUserMessage(label);
   reactToUserMessage();
@@ -136,7 +137,7 @@ async function handleBubbleReply(value, label) {
 
   await deliverTurn(turn);
 
-  if (thanked) reactToCelebrate();
+  if (thanked) reactToGoodbye();
 
   setRepliesEnabled(true);
   isBusy = false;
