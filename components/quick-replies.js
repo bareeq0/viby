@@ -1,7 +1,9 @@
 /** Tappable reply bubbles — the only way users respond (no forms). */
 
-import { scrollMessagesToEnd } from "./messages.js";
+import { syncScrollAfterDockChange } from "./messages.js";
 import { staggerChildren } from "../scripts/motion.js";
+import { bindTap } from "../scripts/touch.js";
+import { refreshReplyDockHeight } from "../scripts/viewport.js";
 
 let containerEl = null;
 let pickHandler = null;
@@ -45,11 +47,10 @@ export function setQuickReplies(replies, onPick) {
 
   if (!replies?.length) {
     containerEl.classList.add("reply-dock--hidden");
-    document.body.classList.remove("reply-dock-active");
+    refreshReplyDockHeight();
     return;
   }
 
-  document.body.classList.add("reply-dock-active");
   containerEl.classList.remove("reply-dock--hidden");
 
   const label = document.createElement("p");
@@ -74,7 +75,7 @@ export function setQuickReplies(replies, onPick) {
     text.textContent = reply.label;
     btn.appendChild(icon);
     btn.appendChild(text);
-    btn.addEventListener("click", () => {
+    bindTap(btn, () => {
       if (pickHandler) pickHandler(reply.value, reply.label);
     });
     row.appendChild(btn);
@@ -82,7 +83,7 @@ export function setQuickReplies(replies, onPick) {
 
   containerEl.appendChild(row);
   staggerChildren(row, ".reply-bubble", { className: "motion-enter", step: 38 });
-  scrollMessagesToEnd();
+  syncScrollAfterDockChange();
 }
 
 export function setRepliesEnabled(enabled) {

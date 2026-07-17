@@ -8,11 +8,22 @@
 
 html {
   -webkit-text-size-adjust: 100%;
+  height: 100%;
+  overflow: hidden;
+  overflow-x: clip;
+}
+
+html.viewport-ready,
+html.viewport-ready body {
+  overscroll-behavior: none;
 }
 
 body {
   margin: 0;
-  min-height: 100dvh;
+  height: var(--app-height, var(--viewport-height, 100dvh));
+  min-height: -webkit-fill-available;
+  overflow: hidden;
+  overflow-x: clip;
   font-family: var(--font-sans);
   font-size: 16px;
   line-height: 1.55;
@@ -38,9 +49,11 @@ body {
 .app {
   display: flex;
   flex-direction: column;
-  min-height: 100dvh;
+  height: 100%;
+  min-height: 0;
   max-width: 720px;
   margin: 0 auto;
+  overflow: hidden;
 }
 
 /* Header */
@@ -82,7 +95,11 @@ body {
   align-items: center;
   justify-content: center;
   gap: 6px;
+  min-height: var(--tap-min);
   padding: 6px 12px;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
   font: inherit;
   font-size: 0.75rem;
   font-weight: 600;
@@ -164,6 +181,8 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  min-height: var(--tap-min);
+  min-width: var(--tap-min);
   padding: 8px 14px;
   font: inherit;
   font-size: 0.8125rem;
@@ -176,6 +195,9 @@ body {
   border-radius: var(--radius-pill);
   cursor: pointer;
   box-shadow: var(--shadow-soft);
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
   transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
 }
 
@@ -214,15 +236,25 @@ body {
 
 .chat__messages {
   flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
   overflow-y: auto;
-  padding: var(--space-md) var(--space-md) 88px;
+  padding: var(--space-md) var(--space-md)
+    calc(
+      max(var(--reply-dock-height, 0px), var(--chat-min-pad-bottom)) + var(--safe-bottom)
+    );
   scroll-behavior: smooth;
-  overscroll-behavior: contain;
+  overscroll-behavior-y: contain;
+  overscroll-behavior-x: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 .chat__reply-dock {
   flex-shrink: 0;
-  padding: var(--space-sm) var(--space-md) calc(var(--space-sm) + var(--safe-bottom));
+  padding: var(--space-sm)
+    calc(var(--space-md) + var(--safe-right))
+    calc(var(--space-sm) + var(--safe-bottom))
+    calc(var(--space-md) + var(--safe-left));
   background: color-mix(in srgb, var(--bg-glass-strong) 92%, transparent);
   backdrop-filter: blur(var(--glass-blur));
   -webkit-backdrop-filter: blur(var(--glass-blur));
@@ -253,9 +285,12 @@ body {
   justify-content: flex-start;
   align-items: stretch;
   gap: 8px;
-  max-height: min(40vh, 240px);
+  max-height: min(40dvh, 40vh, 240px);
   overflow-y: auto;
+  overflow-x: hidden;
   scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 .reply-bubble {
@@ -263,6 +298,7 @@ body {
   align-items: center;
   gap: 8px;
   max-width: min(100%, 280px);
+  min-height: var(--tap-min);
   padding: 12px 24px;
   font: inherit;
   font-size: 0.95rem;
@@ -275,6 +311,9 @@ body {
   border-radius: var(--radius-pill);
   cursor: pointer;
   box-shadow: var(--shadow-soft);
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .reply-bubble__icon {
@@ -475,6 +514,7 @@ body {
   align-items: flex-start;
   gap: var(--space-sm);
   width: 100%;
+  min-height: calc(var(--tap-min) + 24px);
   padding: 24px;
   text-align: right;
   font: inherit;
@@ -484,6 +524,9 @@ body {
   border-radius: var(--radius-lg);
   cursor: pointer;
   box-shadow: var(--shadow-soft);
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .menu-card--hero {
@@ -590,6 +633,9 @@ body {
   background: linear-gradient(145deg, var(--cafe-burgundy), color-mix(in srgb, var(--cafe-burgundy) 88%, #000));
   border-radius: var(--radius-pill);
   box-shadow: var(--shadow-lift);
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
   transition: transform 0.15s ease, box-shadow 0.2s ease;
 }
 
@@ -770,7 +816,10 @@ body {
   }
 
   .chat__messages {
-    padding: var(--space-xl) var(--space-lg) 104px;
+    padding: var(--space-xl) var(--space-lg)
+      calc(
+        max(var(--reply-dock-height, 0px), var(--chat-min-pad-bottom)) + var(--safe-bottom)
+      );
   }
 
   .chat__reply-dock {

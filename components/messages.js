@@ -2,9 +2,13 @@
 
 import { parseBoldMarkdown } from "./dom-utils.js";
 import { prefersReducedMotion } from "../scripts/motion.js";
+import { refreshReplyDockHeight } from "../scripts/viewport.js";
 
 let listEl = null;
 let typingEl = null;
+let contentObs = null;
+
+const BOTTOM_THRESHOLD = 96;
 
 const timeFormatter = new Intl.DateTimeFormat("ar-EG", {
   hour: "numeric",
@@ -13,11 +17,30 @@ const timeFormatter = new Intl.DateTimeFormat("ar-EG", {
 
 export function mountMessages(container) {
   listEl = container;
+  if (!listEl) return;
+
+  listEl.addEventListener("scroll", onMessagesScroll, { passive: true });
+
+  if (typeof ResizeObserver !== "undefined") {
+    contentObs = new ResizeObserver(() => {
+      if (pinnedToBottom) scrollToBottom(false);
+    });
+    contentObs.observe(listEl);
+  }
+}
+
+let pinnedToBottom = true;
+
+function onMessagesScroll() {
+  if (!listEl) return;
+  const dist = listEl.scrollHeight - listEl.scrollTop - listEl.clientHeight;
+  pinnedToBottom = dist <= BOTTOM_THRESHOLD;
 }
 
 export function clearMessages() {
   if (listEl) listEl.innerHTML = "";
   hideTyping();
+  pinnedToBottom = true;
 }
 
 export function formatMessageTime(date = new Date()) {
@@ -25,20 +48,24 @@ export function formatMessageTime(date = new Date()) {
 }
 
 export function scrollMessagesToEnd() {
-  scrollToBottom();
+  scrollToBottom(true);
 }
 
 function scrollBehavior() {
   return prefersReducedMotion() ? "auto" : "smooth";
 }
 
-function scrollToBottom() {
+function scrollToBottom(force = true) {
   if (!listEl) return;
+  if (!force && !pinnedToBottom) return;
+
   requestAnimationFrame(() => {
-    listEl.scrollTo({
-      top: listEl.scrollHeight,
-      behavior: scrollBehavior(),
-    });
+    const top = listEl.scrollHeight - listEl.clientHeight;
+    if (prefersReducedMotion()) {
+      listEl.scrollTop = top;
+    } else {
+      listEl.scrollTo({ top, behavior: scrollBehavior() });
+    }
   });
 }
 
@@ -68,7 +95,7 @@ function buildMessageStack(role, bodyNodes, timeText) {
 
 function append(node) {
   listEl.appendChild(node);
-  scrollToBottom();
+  scrollToBottom(true);
 }
 
 export function showTyping() {
@@ -84,7 +111,7 @@ export function showTyping() {
     </div>`;
   listEl.appendChild(wrap);
   typingEl = wrap;
-  scrollToBottom();
+  scrollToBottom(true);
 }
 
 export function hideTyping() {
@@ -109,5 +136,11 @@ export function renderAssistantText(content) {
 export function appendAssistantNode(node) {
   node.classList.add("message--enter");
   listEl.appendChild(node);
-  scrollToBottom();
+  scrollToBottom(true);
+}
+
+/** After reply dock resizes, keep the latest messages visible. */
+export function syncScrollAfterDockChange() {
+  refreshReplyDockHeight();
+  requestAnimationFrame(() => scrollToBottom(true));
 }

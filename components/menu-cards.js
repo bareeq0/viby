@@ -5,6 +5,7 @@ import { formatPrice } from "../scripts/logic.js";
 import { productDisplayName, productDescription } from "../catalogs/product.js";
 import { formatMessageTime } from "./messages.js";
 import { staggerEnter } from "../scripts/motion.js";
+import { bindTap } from "../scripts/touch.js";
 import { getConfidenceLabel } from "../scripts/recommendation-engine.js";
 
 const PLACEHOLDER_IMAGE = "assets/products/placeholder.svg";
@@ -111,7 +112,7 @@ export function renderMenuCards(items, onSelect, currency = "EGP", primaryId = n
         ${reasonBlock}
         <span class="menu-card__price">${formatPrice(item.price, currency)}</span>
       </span>`;
-    card.addEventListener("click", () => onSelect(item));
+    bindTap(card, () => onSelect(item));
     row.appendChild(card);
     cards.push(card);
   }

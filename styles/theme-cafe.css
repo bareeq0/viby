@@ -48,9 +48,20 @@
 
   --font-sans: "Inter", "Tajawal", system-ui, sans-serif;
   --font-display: "Inter", "Tajawal", serif;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --header-h: 60px;
   --tap-min: 48px;
+
+  /* Dynamic viewport — JS sets --app-height; CSS fallbacks below */
+  --viewport-height: 100svh;
+  --viewport-height: 100dvh;
+  --app-height: var(--viewport-height);
+  --reply-dock-height: 0px;
+  --keyboard-offset: 0px;
+  --chat-min-pad-bottom: 88px;
 }
 
 html {

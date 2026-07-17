@@ -3,6 +3,8 @@
  */
 
 import { deferNonCriticalStyles, loadWebFontsWhenIdle } from "./perf.js";
+import { initViewport } from "./viewport.js";
+import { bindTap } from "./touch.js";
 import { resolvePartner, applyBranding } from "./config.js";
 import { createSession } from "./logic.js";
 import {
@@ -26,6 +28,7 @@ import { emit } from "../platform/events.js";
 import * as platformApi from "../platform/api.js";
 
 deferNonCriticalStyles();
+initViewport();
 
 let partner;
 /** @type {import('./logic.js').Session | null} */
@@ -146,10 +149,12 @@ function handleCardSelect(item) {
 
 function wireEvents() {
   const restart = document.getElementById("btnRestart");
-  restart?.addEventListener("click", () => {
-    if (isBusy) return;
-    initSession().then(() => startConversation());
-  });
+  if (restart) {
+    bindTap(restart, () => {
+      if (isBusy) return;
+      initSession().then(() => startConversation());
+    });
+  }
 }
 
 function mountUi() {

@@ -2,6 +2,8 @@
  * Performance helpers — vanilla only; no dependencies.
  */
 
+import { APP_VERSION } from "./version.js";
+
 const STYLES_BASE = new URL("../styles/", import.meta.url);
 
 const DEFERRED_STYLES = ["motion.css", "vip-mascot.css"];
@@ -14,7 +16,7 @@ export function deferNonCriticalStyles() {
   for (const file of DEFERRED_STYLES) {
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = new URL(file, STYLES_BASE).href;
+    link.href = `${new URL(file, STYLES_BASE).href}?v=${APP_VERSION}`;
     link.media = "print";
     link.onload = () => {
       link.media = "all";

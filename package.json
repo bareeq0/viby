@@ -1,0 +1,10 @@
+{
+  "name": "viby",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "version:sync": "node scripts/sync-version.mjs",
+    "version:bump": "node scripts/sync-version.mjs --bump",
+    "predeploy": "node scripts/sync-version.mjs --bump"
+  }
+}
