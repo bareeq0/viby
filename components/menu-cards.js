@@ -7,8 +7,10 @@ import { formatMessageTime } from "./messages.js";
 import { staggerEnter } from "../scripts/motion.js";
 import { bindTap } from "../scripts/touch.js";
 import { getConfidenceLabel } from "../scripts/recommendation-engine.js";
+import { openProductViewer } from "./product-viewer.js";
 
-const PLACEHOLDER_IMAGE = "assets/products/placeholder.svg";
+
+const PLACEHOLDER_IMAGE = "assets/products/placeholder-product.webp";
 
 function productThumb(item) {
   const hasImage = Boolean(item.image && String(item.image).trim());
@@ -54,7 +56,17 @@ export function renderProductShowcase(item, { reason, menuUrl, currency = "EGP" 
     menuBtn.hidden = true;
   }
 
+  const thumbImg = card.querySelector(".menu-card__thumb");
+  if (thumbImg) {
+    thumbImg.style.cursor = "pointer";
+    thumbImg.addEventListener("click", (e) => {
+      e.stopPropagation();
+      openProductViewer(item, { reason, currency });
+    });
+  }
+
   card.appendChild(menuBtn);
+
   stack.appendChild(card);
 
   const time = document.createElement("time");
@@ -112,7 +124,18 @@ export function renderMenuCards(items, onSelect, currency = "EGP", primaryId = n
         ${reasonBlock}
         <span class="menu-card__price">${formatPrice(item.price, currency)}</span>
       </span>`;
+
+    const thumbImg = card.querySelector(".menu-card__thumb");
+    if (thumbImg) {
+      thumbImg.style.cursor = "pointer";
+      thumbImg.addEventListener("click", (e) => {
+        e.stopPropagation();
+        openProductViewer(item, { reason: isPrimary ? reason : "", currency });
+      });
+    }
+
     bindTap(card, () => onSelect(item));
+
     row.appendChild(card);
     cards.push(card);
   }

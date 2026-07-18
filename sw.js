@@ -78,7 +78,7 @@ const PRECACHE = [
   versioned("./catalogs/product.js"),
   "./partners/demo.json",
   "./assets/icons/favicon.svg",
-  "./assets/products/placeholder.svg",
+  "./assets/products/placeholder-product.webp",
   "./assets/character/viby-default.svg",
 ];
 

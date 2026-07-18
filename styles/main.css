@@ -847,3 +847,246 @@ body {
     scroll-behavior: auto;
   }
 }
+
+/* ─── Product Viewer Modal ─────────────────────────────────────────────────── */
+
+.product-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.product-viewer--open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.product-viewer__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 14, 13, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+/* Container — mobile: stacked column */
+.product-viewer__container {
+  position: relative;
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 420px;
+  max-height: calc(100vh - 32px);
+  background: var(--bg-elevated);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-lift);
+  overflow: hidden;
+  transform: scale(0.95);
+  transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.product-viewer--open .product-viewer__container {
+  transform: scale(1);
+}
+
+/* Close button */
+.product-viewer__close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1002;
+  padding: 0;
+  transition: background 0.18s ease, transform 0.18s ease;
+}
+
+.product-viewer__close:hover {
+  background: rgba(0, 0, 0, 0.68);
+  transform: scale(1.08);
+}
+
+.product-viewer__close svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* ─── Image panel ─── */
+.product-viewer__image-wrapper {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Mobile: tall enough to feel like a hero without overflowing */
+  height: 52vw;
+  min-height: 200px;
+  max-height: 320px;
+  background: color-mix(in srgb, var(--cafe-beige) 30%, var(--cafe-white-solid));
+  padding: 28px;
+  /* no border, no frame — image floats on a clean surface */
+}
+
+.product-viewer__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  /* Subtle lift shadow without clipping anything */
+  filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.12));
+}
+
+/* ─── Details panel ─── */
+.product-viewer__details {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: right;
+  direction: rtl;
+}
+
+.product-viewer__header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.product-viewer__badge {
+  display: inline-block;
+  align-self: flex-start;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--cafe-burgundy);
+  background: var(--accent-soft);
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+}
+
+.product-viewer__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+.product-viewer__price {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--cafe-burgundy);
+}
+
+.product-viewer__desc {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.58;
+  color: var(--text-muted);
+}
+
+.product-viewer__reason-box {
+  padding: 12px 14px;
+  background: color-mix(in srgb, var(--cafe-pistachio) 15%, var(--bg-elevated));
+  border: 1px dashed color-mix(in srgb, var(--cafe-pistachio) 35%, transparent);
+  border-radius: var(--radius-md);
+}
+
+.product-viewer__reason-label {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--cafe-burgundy);
+  margin-bottom: 5px;
+  opacity: 0.85;
+}
+
+.product-viewer__reason-text {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--text);
+}
+
+/* ─── Desktop: side-by-side hero layout ──────────────────────────────────── */
+@media (min-width: 640px) {
+  .product-viewer {
+    padding: 24px;
+  }
+
+  .product-viewer__container {
+    flex-direction: row;
+    max-width: 800px;
+    width: 90vw;
+    /* Fixed height so image panel fills a known area */
+    height: 460px;
+    max-height: 80vh;
+  }
+
+  /* Image takes 62% — the hero */
+  .product-viewer__image-wrapper {
+    flex: 0 0 62%;
+    width: 62%;
+    height: 100%;
+    max-height: none;
+    min-height: 0;
+    padding: 40px;
+    /* Slightly warmer, premium surface */
+    background: color-mix(in srgb, var(--cafe-beige) 22%, var(--cafe-white-solid));
+    border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+  }
+
+  /* Details panel: 38%, vertically centered */
+  .product-viewer__details {
+    flex: 0 0 38%;
+    width: 38%;
+    height: 100%;
+    justify-content: center;
+    gap: 14px;
+    padding: 32px 28px;
+    overflow-y: auto;
+    border-top: none;
+    /* Soft divider between panels */
+    border-left: 1px solid var(--border);
+  }
+
+  .product-viewer__title {
+    font-size: 1.35rem;
+  }
+
+  .product-viewer__price {
+    font-size: 1.1rem;
+  }
+}
+
+/* ─── Scroll Lock ────────────────────────────────────────────────────────── */
+html.body-scroll-lock,
+html.body-scroll-lock body,
+html.body-scroll-lock .chat__messages {
+  overflow: hidden !important;
+  height: 100% !important;
+}
+
+
+

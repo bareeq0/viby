@@ -2,7 +2,7 @@
  * Product knowledge base — rich metadata + behavior scores for the recommender.
  */
 
-export const IMAGE_PLACEHOLDER = "assets/products/placeholder.svg";
+export const IMAGE_PLACEHOLDER = "assets/products/placeholder-product.webp";
 
 /** @typedef {'hot' | 'iced' | 'room'} ProductTemperature */
 /** @typedef {'none' | 'low' | 'medium' | 'high'} ProductLevel */

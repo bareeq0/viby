@@ -7,11 +7,11 @@ export function assetUrl(pathFromRoot) {
   return new URL(`../${pathFromRoot.replace(/^\//, "")}`, import.meta.url).href;
 }
 
-export const PRODUCT_PLACEHOLDER = assetUrl("assets/products/placeholder.svg");
+export const PRODUCT_PLACEHOLDER = assetUrl("assets/products/placeholder-product.webp");
 
 /** @param {string} partnerId @param {string} productId */
 export function productImageUrl(partnerId, productId) {
-  return assetUrl(`assets/products/${partnerId}/${productId}.svg`);
+  return assetUrl(`assets/products/${partnerId}/${productId}.webp`);
 }
 
 /** @param {string} pathFromRoot */
