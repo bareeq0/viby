@@ -11,26 +11,34 @@ import { createEmptyScoring } from "./scoring.js";
 
 
 
+export function resetJourney(session) {
+  session.flowQuestionCount = 0;
+  session.flowPlan = null;
+  session.flowFilterAnswers = [];
+  session.scoring = createEmptyScoring();
+  session.slots = {
+    craving: null,
+    branch: null,
+  };
+  session.lastRecommendations = [];
+  session.lastRecommendation = null;
+  session.selectedItemId = null;
+  session.rejectReasons = [];
+  session.recommendationConstraints = {};
+  session.journeyShownIds = [];
+  session.rejectedProductIds = [];
+  session.askedQuestions = [];
+}
+
 export function createSession(menu, partner) {
-  return {
+  const session = {
     menu,
     partner,
     turn: 0,
     step: "craving",
-    flowQuestionCount: 0,
-    flowPlan: null,
-    flowFilterAnswers: [],
-    scoring: createEmptyScoring(),
-    slots: {
-      craving: null,
-      branch: null,
-    },
-    lastRecommendations: [],
-    lastRecommendation: null,
-    selectedItemId: null,
-    rejectReasons: [],
-    recommendationConstraints: {},
   };
+  resetJourney(session);
+  return session;
 }
 
 export function formatPrice(amount, currency = "EGP") {
